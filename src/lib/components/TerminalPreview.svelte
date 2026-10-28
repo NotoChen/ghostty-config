@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {onMount, tick} from "svelte";
+    import {onMount, tick, untrack} from "svelte";
     import {fade, fly} from "svelte/transition";
     import InteractiveTerminalDom from "$lib/views/InteractiveTerminalDom.svelte";
     import app, {clampPreviewWidth, MAX_PREVIEW_WIDTH, MIN_PREVIEW_WIDTH, savePreview} from "$lib/stores/state.svelte";
@@ -41,6 +41,28 @@
     let windowElement = $state<HTMLDivElement | null>(null);
 
     const isDocked = $derived(app.previewMode === "docked" && viewportWidth >= DOCK_MIN_VIEWPORT);
+
+    // The widest the docked pane may get at the current window size. Every way of changing the
+    // width — dragging, the arrow keys, a width restored from last visit — goes through this, so a
+    // narrow window can't end up with the settings column squeezed to nothing.
+    function dockWidthLimit(): number {
+        const parentWidth = windowElement?.parentElement?.getBoundingClientRect().width ?? window.innerWidth;
+        // ~420px is the sidebar plus a settings column that still fits a label and its control.
+        return Math.max(MIN_PREVIEW_WIDTH, Math.min(MAX_PREVIEW_WIDTH, parentWidth - 420));
+    }
+
+    function setDockWidth(next: number) {
+        app.previewWidth = clampPreviewWidth(Math.min(dockWidthLimit(), next));
+    }
+
+    // A width remembered from a wider window (or from storage) is pulled back into that limit.
+    $effect(() => {
+        if (!isDocked) return;
+        const limit = dockWidthLimit();
+        untrack(() => {
+            if (app.previewWidth > limit) app.previewWidth = limit;
+        });
+    });
 
     onMount(() => {
         x = Math.max(0, (window.innerWidth - width) / 2);
@@ -101,10 +123,7 @@
 
         function onMove(e: MouseEvent) {
             if (resizingDock) {
-                const parentWidth = windowElement?.parentElement?.getBoundingClientRect().width ?? window.innerWidth;
-                // Leave room for the sidebar and a usable settings column before the pane gets wide.
-                const available = Math.max(MIN_PREVIEW_WIDTH, Math.min(MAX_PREVIEW_WIDTH, parentWidth - 420));
-                app.previewWidth = clampPreviewWidth(Math.min(available, dockStartWidth - (e.clientX - dockStartX)));
+                setDockWidth(dockStartWidth - (e.clientX - dockStartX));
                 return;
             }
 
@@ -388,7 +407,7 @@
             onkeydown={(e) => {
                 if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
                 e.preventDefault();
-                app.previewWidth = clampPreviewWidth(app.previewWidth + (e.key === "ArrowLeft" ? 24 : -24));
+                setDockWidth(app.previewWidth + (e.key === "ArrowLeft" ? 24 : -24));
             }}
         ></button>
         <div class="titlebar docked-titlebar">
@@ -425,12 +444,14 @@
         <!-- Each comparison hard-codes what ""/unset means for that setting: the
              selection-clear-* keys have concrete boolean defaults, while copy-on-select and
              cursor-style-blink are *enabled* when unset — so boolCodec ("" -> false) can't
-             be used uniformly here. -->
+             be used uniformly here. copy-on-select is a four-way enum whose default is `none`;
+             only the modes that reach the system clipboard are observable here (`primary` is the
+             X11 selection clipboard, which a page cannot write). -->
         <InteractiveTerminalDom
             {onCwdChange}
             selectionClearOnCopy={config.selectionClearOnCopy === "true"}
             selectionClearOnTyping={config.selectionClearOnTyping === "true"}
-            copyOnSelect={config.copyOnSelect !== "false"}
+            copyOnSelect={["clipboard", "both", "true"].includes(config.copyOnSelect)}
             cursorBlink={config.cursorStyleBlink !== "false"}
             cursorStyle={config.cursorStyle as "block" | "underline" | "bar" | "block_hollow"}
         />
@@ -634,6 +655,10 @@
     display: flex;
     align-items: center;
     padding: 0 12px;
+    /* The window itself is transparent so `background-opacity` reaches the wallpaper, so the
+       titlebar lays down the same tint as .terminal-body and the two read as one surface. */
+    background: color-mix(in srgb, var(--config-bg) calc(var(--config-bg-opacity) * 100%), transparent);
+    backdrop-filter: blur(var(--config-blur));
     border-bottom: 1px solid transparent;
     cursor: grab;
     user-select: none;

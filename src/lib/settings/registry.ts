@@ -192,7 +192,7 @@ export const registry = {
         description: "终端的背景图片。应为 PNG 或 JPEG 文件的路径。\n\n背景图片按终端而非按窗口设置。每个终端的背景图片都会在 VRAM 中复制一份。\n\n警告：对于大尺寸图片，这可能导致显著的 VRAM 占用。",
         key: "background-image",
         name: "背景图片",
-        note: "用作终端背景的图片文件路径。",
+        note: "用作终端背景的图片文件路径。网页里的预览只能加载网络 URL，本地文件路径不会显示出来。",
         since: "1.2.0"
 
     },

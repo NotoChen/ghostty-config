@@ -188,9 +188,10 @@ describe("previewVars()", () => {
         expect(previewVars(conf({fontThicken: "true", fontThickenStrength: "255"}), colors())["text-stroke"]).toBe("0.60px");
     });
 
-    it("leaves bold inheriting unless a concrete bold color is set", () => {
-        expect(previewVars(conf(), colors()).bold).toBe("inherit");
-        expect(previewVars(conf({boldColor: "bright"}), colors()).bold).toBe("inherit");
+    it("emits a bold color only when one is set, so palette colors stay intact", () => {
+        // Absent, not `inherit`: the terminal CSS falls back to each span's own palette color.
+        expect(previewVars(conf(), colors())).not.toHaveProperty("bold");
+        expect(previewVars(conf({boldColor: "bright"}), colors())).not.toHaveProperty("bold");
         expect(previewVars(conf({boldColor: "#ff0000"}), colors()).bold).toBe("#ff0000");
     });
 

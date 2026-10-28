@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type {ExecContext, Line, HistoryEntry, PromptSnapshot, DirNode} from "$lib/terminal/types";
+    import type {ExecContext, Line, HistoryEntry, PromptSnapshot, DirNode, Segment} from "$lib/terminal/types";
     import {cwdString, makeFilesystem} from "$lib/terminal/filesystem";
     import {s} from "$lib/terminal/utils";
     import {tick} from "svelte";
@@ -53,6 +53,26 @@
         for (const segments of lines) {
             history.push({kind: "output", id: outputIdCounter++, segments});
         }
+    }
+
+    /**
+     * A segment's own color, with `bold-color` layered on top when the setting is set — the inline
+     * style wins over the class rules, so a bold output line would otherwise ignore it.
+     */
+    function segmentColor(seg: Segment): string | undefined {
+        const own = seg.hex ?? (seg.palette !== undefined ? `var(--config-palette-${seg.palette})` : undefined);
+        // No own color: `.bold` picks up `--config-bold` and otherwise keeps inheriting.
+        if (!own) return undefined;
+        return seg.bold ? boldOver(own) : own;
+    }
+
+    /**
+     * The prompt's bold spans also carry a palette class, and a class rule can't express "override
+     * only if the setting is set" without a rule per palette slot. Spelling the fallback out inline
+     * keeps that logic in one place: `--config-bold` is only emitted for a concrete color.
+     */
+    function boldOver(color: string): string {
+        return `var(--config-bold, ${color})`;
     }
 
     // Input buffer and cursor state
@@ -262,22 +282,22 @@
         {#each history as entry (entry.id)}
             {#if entry.kind === "cmd"}
                 <div class="line">
-                    <span class="p2 bold">{entry.prompt.user}</span><!--
+                    <span class="p2 bold" style:color={boldOver("var(--config-palette-2)")}>{entry.prompt.user}</span><!--
                     --><span class="p6">@</span><!--
-                    --><span class="p4 bold">{entry.prompt.host}</span><!--
+                    --><span class="p4 bold" style:color={boldOver("var(--config-palette-4)")}>{entry.prompt.host}</span><!--
                     --><span class="fg">:</span><!--
                     --><span class="p3">{entry.prompt.cwd}</span><!--
-                    --><span class="fg bold">$&nbsp;</span><!--
+                    --><span class="fg bold" style:color={boldOver("var(--config-fg)")}>$&nbsp;</span><!--
                     --><span class="fg">{entry.cmd}</span>
                 </div>
             {:else if entry.kind === "ctrlc"}
                 <div class="line">
-                    <span class="p2 bold">{entry.prompt.user}</span><!--
+                    <span class="p2 bold" style:color={boldOver("var(--config-palette-2)")}>{entry.prompt.user}</span><!--
                     --><span class="p6">@</span><!--
-                    --><span class="p4 bold">{entry.prompt.host}</span><!--
+                    --><span class="p4 bold" style:color={boldOver("var(--config-palette-4)")}>{entry.prompt.host}</span><!--
                     --><span class="fg">:</span><!--
                     --><span class="p3">{entry.prompt.cwd}</span><!--
-                    --><span class="fg bold">$&nbsp;</span><!--
+                    --><span class="fg bold" style:color={boldOver("var(--config-fg)")}>$&nbsp;</span><!--
                     --><span class="fg">{entry.input}</span><!--
                     --><span class="p1">^C</span>
                 </div>
@@ -291,7 +311,7 @@
                             class:underline={seg.underline}
                             class:inverse={seg.inverse}
                             class:href={seg.href}
-                            style:color={seg.hex ?? (seg.palette !== undefined ? `var(--config-palette-${seg.palette})` : undefined)}
+                            style:color={segmentColor(seg)}
                         >{seg.text}</span>
                     {/each}
                 </div>
@@ -299,12 +319,12 @@
         {/each}
 
         <div class="line input-line">
-            <span class="p2 bold">{USER}</span><!--
+            <span class="p2 bold" style:color={boldOver("var(--config-palette-2)")}>{USER}</span><!--
             --><span class="p6">@</span><!--
-            --><span class="p4 bold">{HOST}</span><!--
+            --><span class="p4 bold" style:color={boldOver("var(--config-palette-4)")}>{HOST}</span><!--
             --><span class="fg">:</span><!--
             --><span class="p3">{currentCwd}</span><!--
-            --><span class="fg bold">$&nbsp;</span><!--
+            --><span class="fg bold" style:color={boldOver("var(--config-fg)")}>$&nbsp;</span><!--
             --><span class="fg">{beforeCursor}</span><!--
             --><span
                     class="cursor"
@@ -382,6 +402,8 @@
     font-weight: 700;
     font-family: var(--config-font-family-bold);
     font-variation-settings: var(--config-font-variation-bold);
+    /* `--config-bold` is only emitted when `bold-color` is a concrete color; without it the
+       declaration is invalid at computed-value time and the span keeps inheriting. */
     color: var(--config-bold);
 }
 .dimmed {opacity: var(--config-faint-opacity);}

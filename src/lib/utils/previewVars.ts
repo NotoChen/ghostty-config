@@ -189,11 +189,14 @@ function cssImage(raw: string): string {
     return `url("${value.replace(/["\\\n\r]/g, "")}")`;
 }
 
-function boldColor(value: string): string {
+/**
+ * `bold-color` is either a concrete color or `bright`. `bright` means "the bright variant of the
+ * color the cell already used", which a static CSS var cannot express, so both it and unset yield
+ * `null` — the terminal CSS then leaves bold spans on their palette color.
+ */
+function boldColor(value: string): string | null {
     const trimmed = value.trim();
-    // `bright` means "the bright variant of whatever color the cell already used", which a static
-    // CSS var cannot express; leaving bold to inherit is the same visual result as unset.
-    if (trimmed === "" || trimmed === "bright") return "inherit";
+    if (trimmed === "" || trimmed === "bright") return null;
     return trimmed;
 }
 
@@ -258,7 +261,10 @@ export function previewVars(conf: PreviewConfig, colors: PreviewColors): Record<
     vars["bg-image-repeat"] = conf.backgroundImageRepeat === "true" ? "repeat" : "no-repeat";
 
     // Text decorations and cursor shape
-    vars.bold = boldColor(conf.boldColor);
+    // Emitted only when it is a real color: the CSS uses `var(--config-bold, <palette color>)`, and
+    // an always-present var would flatten palette colors on every bold span.
+    const bold = boldColor(conf.boldColor);
+    if (bold !== null) vars.bold = bold;
     vars["faint-opacity"] = String(Math.min(1, Math.max(0, numberCodec.parse(conf.faintOpacity) ?? 0.5)));
     // Coerced to a number: downstream CSS (color-mix in CursorPreview, the blink keyframes) needs one.
     vars["cursor-opacity"] = String(Math.min(1, Math.max(0, numberCodec.parse(conf.cursorOpacity) ?? 1)));

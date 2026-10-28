@@ -129,6 +129,8 @@ A real emulator like `ghostty-web` keeps its state inside a surface that must be
 
 The pair is a contract, not documentation: a key listed in `previewedSettings` but never read by the preview claims feedback that never arrives, and a preview mapping with no listing makes a working preview look inert. **Change both in the same commit.** Everything absent is deliberate — native window chrome, keybinds, GTK/Linux/macOS behaviour, VT protocol switches, and metrics CSS cannot express (`adjust-font-baseline`, strikethrough/overline thickness) are config-only, and the UI now says so instead of pretending otherwise.
 
+Two things are listed but only partially reproducible, so the row text carries the caveat: `background-image` loads only when the value is a URL the browser can fetch (a local path draws nothing — see the `note` on that registry entry), and `copy-on-select` is observable only for the modes that reach the system clipboard (`clipboard`/`both`; `primary` is the X11 selection clipboard a page cannot write). `macosCustomIcon` is **not** listed: it always names a file on the visitor's disk, so it could never show anything.
+
 `+layout.svelte` still owns the live config's colors; a second config's vars come from `utils/configVars.ts` for the side-by-side view.
 
 ### Placement: docked by default, floating on request

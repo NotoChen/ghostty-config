@@ -26,11 +26,22 @@ export function clampPreviewWidth(width: number): number {
 
 // Placement is a per-visitor convenience, so it lives in localStorage rather than in the config:
 // someone who prefers the pop-out window keeps it after a reload, and nobody else is affected.
-function loadPreview(): Partial<AppState> {
-    if (typeof localStorage === "undefined") return {};
-
+//
+// Touching the global is itself fallible: with storage blocked (Safari "Block All Cookies", a
+// storage-denied iframe) the `localStorage` getter throws SecurityError, and `typeof` only guards
+// ReferenceError. Since this runs at module scope, an escape would stop the app from booting.
+function previewStorage(): Storage | null {
     try {
-        const raw = localStorage.getItem(STORAGE_KEY);
+        return typeof localStorage === "undefined" ? null : localStorage;
+    }
+    catch {
+        return null;
+    }
+}
+
+function loadPreview(): Partial<AppState> {
+    try {
+        const raw = previewStorage()?.getItem(STORAGE_KEY);
         if (!raw) return {};
 
         const data = JSON.parse(raw) as Record<string, unknown>;
@@ -57,10 +68,8 @@ const app: AppState = $state({
 });
 
 export function savePreview() {
-    if (typeof localStorage === "undefined") return;
-
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        previewStorage()?.setItem(STORAGE_KEY, JSON.stringify({
             mode: app.previewMode,
             width: app.previewWidth,
             visible: app.previewVisible,
