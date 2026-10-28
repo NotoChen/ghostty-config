@@ -69,11 +69,26 @@ export function detachLocalConfig() {
     void refreshLocalConfig();
 }
 
+// The bridge only ever answers loopback sockets (see scripts/vite-plugin-local-config.ts), so a
+// page served from anywhere else — GitHub Pages, a LAN address — can skip the probe entirely
+// instead of logging a 404 on every visit.
+function canReachBridge() {
+    if (typeof location === "undefined") return false;
+    return location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.hostname === "[::1]";
+}
+
 /** Re-read the on-disk config. Concurrent calls share one request. */
 export function refreshLocalConfig(): Promise<boolean> {
     if (inFlight) return inFlight;
     // An attached file is the source of truth once present; polling the bridge must not replace it.
     if (localConfig.source !== "bridge") return Promise.resolve(localConfig.status === "ready");
+
+    if (!canReachBridge()) {
+        localConfig.status = "unavailable";
+        localConfig.path = null;
+        localConfig.error = null;
+        return Promise.resolve(false);
+    }
 
     localConfig.status = localConfig.status === "ready" ? "ready" : "loading";
 
