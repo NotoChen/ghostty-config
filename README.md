@@ -98,7 +98,7 @@ bun run test     # Vitest 单元测试
 
 ### 在线版：上传或粘贴
 
-静态部署（GitHub Pages）读不到磁盘，所以页面会改为让你**上传配置文件**或**粘贴配置文本**。文件只在浏览器里读取，不会上传到任何服务器；之后的对比、合并选项、注释分组、差异预览都和本机运行一致，只是最后一步从「直接写回磁盘」变成「下载合并后的文件」，由你自己替换 `~/.config/ghostty/config`（macOS 上是 `~/Library/Application Support/com.mitchellh.ghostty/config.ghostty`）。
+静态部署（GitHub Pages）读不到磁盘，所以页面会改为让你**上传配置文件**或**粘贴配置文本**。文件只在浏览器里读取，不会上传到任何服务器；之后的对比、合并选项、注释分组、差异预览都和本机运行一致，只是最后一步从「直接写回磁盘」变成「下载合并后的文件」，由你自己替换 `~/.config/ghostty/config`（macOS 上是 `~/Library/Application Support/com.mitchellh.ghostty/config.ghostty`）。从非本机地址打开时页面也不会去请求本机桥接接口，所以控制台不会出现无意义的 404。
 
 配置文件的位置：
 
