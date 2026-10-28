@@ -63,9 +63,10 @@ export const previewedSettings = new Set<SettingKey>([
     "copyOnSelect",
 
     // macOS 应用图标 — rendered by the icon preview and the dock, not the terminal pane.
+    // `macosCustomIcon` is absent on purpose: it names a file on the visitor's disk, which the page
+    // can neither read nor draw, so claiming it here would promise a change that never appears.
     "macosIcon",
     "macosIconFrame",
-    "macosCustomIcon",
     "macosIconGhostColor",
     "macosIconScreenColor",
 ]);

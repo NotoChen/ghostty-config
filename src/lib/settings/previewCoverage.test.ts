@@ -18,7 +18,7 @@ describe("previewedSettings", () => {
     });
 
     it("does not claim settings the DOM preview cannot show", () => {
-        for (const key of ["keybind", "gtkTitlebar", "macosTitlebarStyle", "adjustBoxThickness"]) {
+        for (const key of ["keybind", "gtkTitlebar", "macosTitlebarStyle", "adjustBoxThickness", "macosCustomIcon"]) {
             expect(isPreviewed(key)).toBe(false);
         }
     });
