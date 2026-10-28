@@ -1,0 +1,14 @@
+version: 2
+
+updates:
+  # The project is installed and built with Bun (`bun.lock`), so the updater has to be the Bun
+  # ecosystem; `npm_and_yarn` cannot edit `bun.lock` and errors out instead of opening a PR.
+  - package-ecosystem: "bun"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
