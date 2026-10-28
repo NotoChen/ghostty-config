@@ -10,6 +10,9 @@ notes
 !.github/pull_request_template.md
 .idea
 
+# Scratch space for screenshots taken while working on docs
+.tmp-shots
+
 # Output
 .output
 .vercel

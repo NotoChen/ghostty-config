@@ -1,0 +1,788 @@
+<script lang="ts">
+    import {onMount, tick} from "svelte";
+    import {fade, fly} from "svelte/transition";
+    import InteractiveTerminalDom from "$lib/views/InteractiveTerminalDom.svelte";
+    import app from "$lib/stores/state.svelte";
+    import config from "$lib/stores/config.svelte";
+    import {clearRecentChanges, recentChanges, trackConfig} from "$lib/stores/preview.svelte";
+
+    const DEFAULT_WIDTH = 680;
+    const DEFAULT_HEIGHT = 480;
+    const MIN_WIDTH = 420;
+    const MIN_HEIGHT = 280;
+    const MINIMIZE_DURATION = 280;
+    const RESTORE_DURATION = 260;
+    // Below this width the docked split has no room left for the settings column, so the preview
+    // falls back to the floating window (still the same component instance, same scrollback).
+    const DOCK_MIN_VIEWPORT = 900;
+
+    type ResizeDirection = "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw";
+
+    let x = $state(0);
+    let y = $state(0);
+    let width = $state(DEFAULT_WIDTH);
+    let height = $state(DEFAULT_HEIGHT);
+    let dragging = $state(false);
+    let resizing = $state(false);
+    let animating = $state(false);
+    let viewportWidth = $state(typeof window === "undefined" ? 1440 : window.innerWidth);
+    let resizeDirection: ResizeDirection | null = null;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+    let resizeStartX = 0;
+    let resizeStartY = 0;
+    let startWidth = DEFAULT_WIDTH;
+    let startHeight = DEFAULT_HEIGHT;
+    let startLeft = 0;
+    let startTop = 0;
+    let windowElement = $state<HTMLDivElement | null>(null);
+
+    const isDocked = $derived(app.previewMode === "docked" && viewportWidth >= DOCK_MIN_VIEWPORT);
+
+    onMount(() => {
+        x = Math.max(0, (window.innerWidth - width) / 2);
+        y = Math.max(0, (window.innerHeight - height) / 3);
+    });
+
+    // Record what the editor changed so the chips in the preview can name the difference.
+    $effect(() => {
+        trackConfig(config);
+    });
+
+    // Every new change flashes the pane border once. Keyed on the newest chip's id — writing a
+    // counter from an effect that reads the list is the same update-depth trap as above.
+    const flashKey = $derived(recentChanges.at(-1)?.id ?? 0);
+
+    function startDrag(e: MouseEvent) {
+        if (isDocked || resizing || animating || !app.previewVisible) return;
+        dragging = true;
+        dragOffsetX = e.clientX - x;
+        dragOffsetY = e.clientY - y;
+    }
+
+    function startResize(e: MouseEvent, direction: ResizeDirection) {
+        if (isDocked || animating || !app.previewVisible) return;
+        e.preventDefault();
+        e.stopPropagation();
+        resizing = true;
+        resizeDirection = direction;
+        resizeStartX = e.clientX;
+        resizeStartY = e.clientY;
+        startWidth = width;
+        startHeight = height;
+        startLeft = x;
+        startTop = y;
+    }
+
+    $effect(() => {
+        if (!dragging && !resizing) return;
+
+        function onMove(e: MouseEvent) {
+            if (dragging) {
+                x = Math.max(0, Math.min(window.innerWidth - width, e.clientX - dragOffsetX));
+                y = Math.max(0, Math.min(window.innerHeight - height, e.clientY - dragOffsetY));
+                return;
+            }
+
+            if (!resizing || !resizeDirection) return;
+
+            const dx = e.clientX - resizeStartX;
+            const dy = e.clientY - resizeStartY;
+
+            let nextX = startLeft;
+            let nextY = startTop;
+            let nextWidth = startWidth;
+            let nextHeight = startHeight;
+
+            if (resizeDirection.includes("e")) {
+                nextWidth = startWidth + dx;
+            }
+
+            if (resizeDirection.includes("s")) {
+                nextHeight = startHeight + dy;
+            }
+
+            if (resizeDirection.includes("w")) {
+                nextWidth = startWidth - dx;
+                nextX = startLeft + dx;
+            }
+
+            if (resizeDirection.includes("n")) {
+                nextHeight = startHeight - dy;
+                nextY = startTop + dy;
+            }
+
+            if (resizeDirection.includes("w") && nextWidth < MIN_WIDTH) {
+                nextX = startLeft + (startWidth - MIN_WIDTH);
+                nextWidth = MIN_WIDTH;
+            }
+            else {
+                nextWidth = Math.max(MIN_WIDTH, nextWidth);
+            }
+
+            if (resizeDirection.includes("n") && nextHeight < MIN_HEIGHT) {
+                nextY = startTop + (startHeight - MIN_HEIGHT);
+                nextHeight = MIN_HEIGHT;
+            }
+            else {
+                nextHeight = Math.max(MIN_HEIGHT, nextHeight);
+            }
+
+            if (nextX < 0) {
+                if (resizeDirection.includes("w")) {
+                    nextWidth += nextX;
+                }
+                nextX = 0;
+            }
+
+            if (nextY < 0) {
+                if (resizeDirection.includes("n")) {
+                    nextHeight += nextY;
+                }
+                nextY = 0;
+            }
+
+            nextWidth = Math.max(MIN_WIDTH, Math.min(nextWidth, window.innerWidth - nextX));
+            nextHeight = Math.max(MIN_HEIGHT, Math.min(nextHeight, window.innerHeight - nextY));
+
+            x = nextX;
+            y = nextY;
+            width = nextWidth;
+            height = nextHeight;
+        }
+
+        function onUp() {
+            dragging = false;
+            resizing = false;
+            resizeDirection = null;
+        }
+
+        window.addEventListener("mousemove", onMove);
+        window.addEventListener("mouseup", onUp);
+        return () => {
+            window.removeEventListener("mousemove", onMove);
+            window.removeEventListener("mouseup", onUp);
+        };
+    });
+
+    function clearAnimationStyles() {
+        windowElement?.style.removeProperty("transform");
+        windowElement?.style.removeProperty("opacity");
+    }
+
+    function shouldReduceMotion() {
+        return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    }
+
+    function getDockButtonRect() {
+        const dockButton = document.getElementById("ghostty-terminal-dock-button");
+        return dockButton?.getBoundingClientRect() ?? null;
+    }
+
+    async function animateDockTransition(mode: "minimize" | "restore") {
+        if (!windowElement) return false;
+
+        const dockRect = getDockButtonRect();
+        if (!dockRect) return false;
+
+        const sourceRect = windowElement.getBoundingClientRect();
+        const deltaX = (dockRect.left + dockRect.width / 2) - (sourceRect.left + sourceRect.width / 2);
+        const deltaY = (dockRect.top + dockRect.height / 2) - (sourceRect.top + sourceRect.height / 2);
+        const scaleX = sourceRect.width > 0 ? Math.max(0.12, dockRect.width / sourceRect.width) : 0.12;
+        const scaleY = sourceRect.height > 0 ? Math.max(0.12, dockRect.height / sourceRect.height) : 0.12;
+
+        const keyframes = mode === "minimize"
+            ? [
+                {transform: "translate3d(0px, 0px, 0px) scale(1, 1)", opacity: 1},
+                {transform: `translate3d(${deltaX}px, ${deltaY}px, 0px) scale(${scaleX}, ${scaleY})`, opacity: 0.18},
+            ]
+            : [
+                {transform: `translate3d(${deltaX}px, ${deltaY}px, 0px) scale(${scaleX}, ${scaleY})`, opacity: 0.18},
+                {transform: "translate3d(0px, 0px, 0px) scale(1, 1)", opacity: 1},
+            ];
+
+        const animation = windowElement.animate(keyframes, {
+            duration: mode === "minimize" ? MINIMIZE_DURATION : RESTORE_DURATION,
+            easing: mode === "minimize"
+                ? "cubic-bezier(0.18, 0.9, 0.22, 1)"
+                : "cubic-bezier(0.2, 0.8, 0.2, 1)",
+            fill: "both",
+        });
+
+        try {
+            await animation.finished;
+            return true;
+        }
+        catch {
+            return false;
+        }
+        finally {
+            animation.cancel();
+            clearAnimationStyles();
+        }
+    }
+
+    /** Swap between the docked split pane and the floating window, keeping the same terminal. */
+    async function setMode(mode: "docked" | "floating") {
+        if (app.previewMode === mode) {
+            app.previewVisible = true;
+            return;
+        }
+
+        const element = windowElement;
+        const before = element?.getBoundingClientRect();
+
+        app.previewMode = mode;
+        app.previewVisible = true;
+        app.previewMinimized = false;
+        app.previewRestoreRequested = false;
+        await tick();
+
+        if (!element || !before || shouldReduceMotion()) return;
+
+        const after = element.getBoundingClientRect();
+        if (after.width === 0 || after.height === 0) return;
+
+        const deltaX = before.left - after.left;
+        const deltaY = before.top - after.top;
+        const scaleX = before.width / after.width;
+        const scaleY = before.height / after.height;
+
+        const animation = element.animate([
+            {transformOrigin: "top left", transform: `translate(${deltaX}px, ${deltaY}px) scale(${scaleX}, ${scaleY})`},
+            {transformOrigin: "top left", transform: "translate(0px, 0px) scale(1, 1)"},
+        ], {duration: 280, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)"});
+
+        try {
+            await animation.finished;
+        }
+        catch {
+            // Interrupted by a new transition; nothing to restore.
+        }
+        finally {
+            animation.cancel();
+        }
+    }
+
+    async function minimize() {
+        if (!app.previewVisible || app.previewMinimized || animating) return;
+
+        dragging = false;
+        resizing = false;
+        resizeDirection = null;
+        app.previewRestoreRequested = false;
+
+        if (shouldReduceMotion()) {
+            app.previewVisible = false;
+            app.previewMinimized = true;
+            app.previewRestoreRequested = false;
+            clearRecentChanges();
+            return;
+        }
+
+        animating = true;
+        await animateDockTransition("minimize");
+        animating = false;
+
+        app.previewVisible = false;
+        app.previewMinimized = true;
+        clearRecentChanges();
+    }
+
+    /** The dock / close / traffic-light action for whichever placement is current. */
+    function hidePreview() {
+        if (isDocked) {
+            app.previewVisible = false;
+            clearRecentChanges();
+            return;
+        }
+        void minimize();
+    }
+
+    $effect(() => {
+        if (!app.previewRestoreRequested || app.previewMinimized) return;
+
+        app.previewRestoreRequested = false;
+        if (shouldReduceMotion()) return;
+
+        let canceled = false;
+        void (async () => {
+            animating = true;
+            await animateDockTransition("restore");
+            if (!canceled) {
+                animating = false;
+            }
+        })();
+
+        return () => {
+            canceled = true;
+            animating = false;
+            clearAnimationStyles();
+        };
+    });
+
+    let title = $state("交互式预览");
+    function onCwdChange(cwd: string) {
+        title = cwd;
+    }
+</script>
+
+<svelte:window onresize={() => viewportWidth = window.innerWidth} />
+
+<div
+    bind:this={windowElement}
+    class="ghostty-window"
+    class:docked={isDocked}
+    class:floating={!isDocked}
+    class:minimized={!isDocked && !app.previewVisible && !animating}
+    class:docked-hidden={isDocked && !app.previewVisible}
+    style:left={isDocked ? undefined : `${x}px`}
+    style:top={isDocked ? undefined : `${y}px`}
+    style:width={isDocked ? undefined : `${width}px`}
+    style:height={isDocked ? undefined : `${height}px`}
+    style:cursor={dragging ? "grabbing" : undefined}
+    role="dialog"
+    aria-label="交互式终端预览"
+    aria-hidden={!app.previewVisible && !animating}
+    aria-modal="false"
+>
+    {#if isDocked}
+        <div class="titlebar docked-titlebar">
+            <span class="live-dot" aria-hidden="true"></span>
+            <span class="window-title">实时预览</span>
+            <div class="preview-actions">
+                <button type="button" class="action-button" onclick={() => setMode("floating")} title="弹出为窗口" aria-label="弹出为窗口">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6" /><path d="M20 4 11 13" /><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" /></svg>
+                </button>
+                <button type="button" class="action-button" onclick={hidePreview} title="隐藏预览" aria-label="隐藏预览">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                </button>
+            </div>
+        </div>
+    {:else}
+        <div class="titlebar" role="presentation" onmousedown={startDrag}>
+            <div class="traffic-lights">
+                <button type="button" class="dot dot-red" onclick={hidePreview} aria-label="关闭预览窗口" title="关闭">
+                    <span class="dot-symbol">&times;</span>
+                </button>
+                <button type="button" class="dot dot-yellow" onclick={hidePreview} aria-label="最小化" title="最小化">
+                    <span class="dot-symbol">&ndash;</span>
+                </button>
+                <button type="button" class="dot dot-green" onclick={() => setMode("docked")} aria-label="停靠到右侧" title="停靠到右侧">
+                    <span class="dot-symbol">&plus;</span>
+                </button>
+            </div>
+            <span class="window-title">{title}</span>
+            <div class="titlebar-end"></div>
+        </div>
+    {/if}
+
+    <div class="terminal-body">
+        <!-- Each comparison hard-codes what ""/unset means for that setting: the
+             selection-clear-* keys have concrete boolean defaults, while copy-on-select and
+             cursor-style-blink are *enabled* when unset — so boolCodec ("" -> false) can't
+             be used uniformly here. -->
+        <InteractiveTerminalDom
+            {onCwdChange}
+            selectionClearOnCopy={config.selectionClearOnCopy === "true"}
+            selectionClearOnTyping={config.selectionClearOnTyping === "true"}
+            copyOnSelect={config.copyOnSelect !== "false"}
+            cursorBlink={config.cursorStyleBlink !== "false"}
+            cursorStyle={config.cursorStyle as "block" | "underline" | "bar" | "block_hollow"}
+        />
+
+        {#if recentChanges.length > 0}
+            <div class="change-overlay" aria-live="polite" aria-atomic="false">
+                {#each recentChanges as change (change.id)}
+                    <div
+                        class="change-chip"
+                        in:fly={{y: -6, duration: 180}}
+                        out:fade={{duration: 160}}
+                    >
+                        <span class="change-name">{change.name}</span>
+                        <span class="change-values">
+                            <span class="change-from">{change.from}</span>
+                            <span class="change-arrow" aria-hidden="true">→</span>
+                            <span class="change-to">{change.to}</span>
+                        </span>
+                    </div>
+                {/each}
+            </div>
+        {/if}
+    </div>
+
+    {#if !isDocked}
+        <div class="resize-handle resize-n" onmousedown={(e) => startResize(e, "n")} aria-hidden="true"></div>
+        <div class="resize-handle resize-s" onmousedown={(e) => startResize(e, "s")} aria-hidden="true"></div>
+        <div class="resize-handle resize-e" onmousedown={(e) => startResize(e, "e")} aria-hidden="true"></div>
+        <div class="resize-handle resize-w" onmousedown={(e) => startResize(e, "w")} aria-hidden="true"></div>
+        <div class="resize-handle resize-ne" onmousedown={(e) => startResize(e, "ne")} aria-hidden="true"></div>
+        <div class="resize-handle resize-nw" onmousedown={(e) => startResize(e, "nw")} aria-hidden="true"></div>
+        <div class="resize-handle resize-se" onmousedown={(e) => startResize(e, "se")} aria-hidden="true"></div>
+        <div class="resize-handle resize-sw" onmousedown={(e) => startResize(e, "sw")} aria-hidden="true"></div>
+    {/if}
+
+    {#if flashKey > 0}
+        {#key flashKey}
+            <div class="flash-ring" aria-hidden="true"></div>
+        {/key}
+    {/if}
+</div>
+
+<style>
+.ghostty-window {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--config-bg);
+    position: relative;
+}
+
+/* --- docked: the default right-hand split pane --- */
+.ghostty-window.docked {
+    flex: 0 0 var(--preview-width);
+    width: var(--preview-width);
+    height: 100%;
+    z-index: 1;
+    border-left: 2px solid var(--border-level-1);
+}
+
+.ghostty-window.docked-hidden {
+    display: none;
+}
+
+.docked-titlebar {
+    height: 53px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 0 10px 0 16px;
+    background: rgba(44, 39, 51, 0.9);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-separator);
+    color: var(--font-color);
+    user-select: none;
+}
+
+.docked-titlebar .window-title {
+    flex: 1;
+    text-align: left;
+    font-size: 1.05rem;
+    font-weight: 600;
+    pointer-events: none;
+}
+
+.live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-success);
+    box-shadow: 0 0 6px var(--color-success);
+    flex-shrink: 0;
+}
+
+.preview-actions {
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.action-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: var(--radius-level-5);
+    color: var(--font-color-muted);
+    cursor: pointer;
+}
+
+.action-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--font-color);
+}
+
+.action-button:active {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.action-button svg {
+    width: 15px;
+    height: 15px;
+}
+
+/* --- floating: the draggable macOS-style window --- */
+.ghostty-window.floating {
+    position: fixed;
+    z-index: 1000;
+    border-radius: 12px;
+    border: 1px solid var(--border-level-1);
+    box-shadow: 0 0 20px -1px rgba(0, 0, 0, 0.7);
+    pointer-events: all;
+    transform-origin: center center;
+}
+
+.ghostty-window.floating.minimized {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.ghostty-window.floating::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    box-shadow: 0 0 1px white inset;
+    border-radius: inherit;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.floating .titlebar {
+    height: 38px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    border-bottom: 1px solid transparent;
+    cursor: grab;
+    user-select: none;
+    transition: border-color 250ms cubic-bezier(0, 0.3, 0.7, 1);
+}
+
+.floating .titlebar:active {
+    cursor: grabbing;
+    border-bottom: 1px solid var(--border-level-1);
+}
+
+.traffic-lights {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+}
+
+.dot-red {background: #FF5F57;}
+.dot-yellow {background: #FEBC2E;}
+.dot-green {background: #28C840;}
+
+.dot-symbol {
+    line-height: 1;
+    color: rgba(0, 0, 0, 0);
+    font-weight: 400;
+    margin-top: -3px;
+}
+
+.traffic-lights:hover .dot-symbol {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+.window-title {
+    flex: 1;
+    text-align: center;
+    font-weight: 700;
+    pointer-events: none;
+}
+
+.titlebar-end {
+    width: 52px;
+    flex-shrink: 0;
+}
+
+/* --- shared body + change feedback --- */
+.terminal-body {
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+    position: relative;
+}
+
+.change-overlay {
+    position: absolute;
+    /* Bottom edge: the top lines are where the welcome text and the prompt live, and covering
+       those is exactly what makes a live preview unreadable while you tweak a setting. */
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.change-chip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 8px;
+    max-width: min(100%, 340px);
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--config-bg) 82%, black);
+    border: 1px solid color-mix(in srgb, var(--config-fg) 22%, transparent);
+    color: var(--config-fg);
+    font-family: var(--font-family);
+    font-size: 11px;
+    line-height: 1.2;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(6px);
+}
+
+.change-name {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.change-values {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-family-mono);
+    white-space: nowrap;
+    opacity: 0.85;
+    min-width: 0;
+}
+
+.change-from {
+    text-decoration: line-through;
+    opacity: 0.6;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.change-to {
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.change-arrow {
+    opacity: 0.5;
+}
+
+.flash-ring {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 6;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 2px var(--color-input-accent);
+    animation: flash-ring 650ms ease-out forwards;
+}
+
+@keyframes flash-ring {
+    from {
+        opacity: 0.95;
+        box-shadow: inset 0 0 0 2px var(--color-input-accent), inset 0 0 28px -6px var(--color-input-accent);
+    }
+    to {
+        opacity: 0;
+        box-shadow: inset 0 0 0 2px transparent, inset 0 0 0 0 transparent;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .flash-ring {
+        animation: none;
+    }
+
+    .live-dot {
+        box-shadow: none;
+    }
+}
+
+/* --- floating resize handles --- */
+.resize-handle {
+    position: absolute;
+    z-index: 3;
+}
+
+.resize-n,
+.resize-s {
+    left: 10px;
+    right: 10px;
+    height: 8px;
+}
+
+.resize-n {
+    top: -4px;
+    cursor: ns-resize;
+}
+
+.resize-s {
+    bottom: -4px;
+    cursor: ns-resize;
+}
+
+.resize-e,
+.resize-w {
+    top: 10px;
+    bottom: 10px;
+    width: 8px;
+}
+
+.resize-e {
+    right: -4px;
+    cursor: ew-resize;
+}
+
+.resize-w {
+    left: -4px;
+    cursor: ew-resize;
+}
+
+.resize-ne,
+.resize-nw,
+.resize-se,
+.resize-sw {
+    width: 12px;
+    height: 12px;
+}
+
+.resize-ne {
+    top: -4px;
+    right: -4px;
+    cursor: nesw-resize;
+}
+
+.resize-nw {
+    top: -4px;
+    left: -4px;
+    cursor: nwse-resize;
+}
+
+.resize-se {
+    right: -4px;
+    bottom: -4px;
+    cursor: nwse-resize;
+}
+
+.resize-sw {
+    left: -4px;
+    bottom: -4px;
+    cursor: nesw-resize;
+}
+</style>

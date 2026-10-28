@@ -8,12 +8,12 @@
 [![Framework · Svelte](https://www.shieldcn.dev/badge/Framework-Svelte-FF3E00.svg?logo=svelte&variant=branded&size=sm)](https://svelte.dev)
 [![Hosting · GitHub Pages](https://www.shieldcn.dev/badge/Hosting-GitHub_Pages-222222.svg?logo=github&variant=branded&size=sm)](https://notochen.github.io/ghostty-config/)
 
-  <img src="https://github.com/user-attachments/assets/b0937e12-d7ef-4bd1-a007-e468da2f7dfc" alt="终端配色预览">
+  <img src="./docs/screenshots/colors.jpg" alt="配色编辑与实时预览">
 </div>
 
 ## 这是什么
 
-Ghostty Config 是一个网页版的 [Ghostty](https://ghostty.org/) 配置生成器：不用手写配置文件，点几下就能改字体、配色、光标、透明度和快捷键，改的过程里终端预览会**实时**跟着变，最后导出一份干净的配置。
+Ghostty Config 是一个网页版的 [Ghostty](https://ghostty.org/) 配置生成器：不用手写配置文件，点几下就能改字体、配色、光标、透明度和快捷键，改的过程里终端预览会**实时**跟着变，最后导出一份干净的配置。界面默认就是左边设置、右边实时预览的分栏，想看得更细可以把预览弹成可拖动、可缩放的独立窗口。
 
 本项目是在 [zerebos/ghostty-config](https://github.com/zerebos/ghostty-config) 基础上的二次开发（Fork），在原版之上主要做了这些改动：
 
@@ -23,6 +23,7 @@ Ghostty Config 是一个网页版的 [Ghostty](https://ghostty.org/) 配置生�
 - **快捷键作用说明**：每一行下方用中文说明这个操作的用途。
 - **本地配置对比**：一边是你机器上真实的配置文件，一边是应用内正在编辑的配置，逐项列出差异；写回时自动备份、自动校验、自动按功能模块分组加中文注释。
 - **在线版也能处理本地配置**：静态部署没有磁盘访问权限，所以支持**上传配置文件**或**粘贴配置文本**，对比、合并、注释分组的能力完全一致，最后下载合并结果替换原文件即可。
+- **默认左右分栏，改动能看见**：设置项在左、实时预览在右。每改一项，预览区会浮出一条提示，写明改的是哪一项、从什么改成了什么（调色板会精确到第几个色位），预览同时闪一下高亮，已经渲染出来的内容原地换肤，不会被清屏。
 
 **在线体验：** [notochen.github.io/ghostty-config](https://notochen.github.io/ghostty-config/)
 
@@ -53,6 +54,21 @@ Ghostty Config 是一个网页版的 [Ghostty](https://ghostty.org/) 配置生�
 - **逐项内联说明**：每个设置项下方直接写清它是什么、怎么填，不需要点开帮助。
 - **侧边栏搜索**：像 macOS 系统设置一样，直接搜到任意设置并跳转。
 - **单项恢复默认**：任何一项都能一键还原。
+
+
+## 界面
+
+**字体**——拖动字号滑块，预览里已经渲染出来的内容立刻按新字号重排，同时提示条写明 `13 → 18`：
+
+<img src="./docs/screenshots/fonts.jpg" alt="字体大小与实时预览">
+
+**快捷键**——列表里显示的是键盘上实际按的键（⌘ ⇧ ⌃ ⌥），点一下就能重新录制：
+
+<img src="./docs/screenshots/keybinds.jpg" alt="快捷键编辑">
+
+**本地配置**——磁盘上的真实文件和编辑器里正在改的配置并排对照，逐项列出差异：
+
+<img src="./docs/screenshots/local-config.jpg" alt="本地配置对比">
 
 
 ## 本地运行

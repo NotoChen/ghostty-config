@@ -1,27 +1,24 @@
 <script lang="ts">
-    import FloatingTerminal from "$lib/components/FloatingTerminal.svelte";
     import app from "$lib/stores/state.svelte";
 
     import appIcon from "$lib/images/icon.webp";
     import GhosttyIcon from "./GhosttyIcon.svelte";
 
     function activateTerminal() {
-        if (!app.floatingTerminalRunning) {
-            app.floatingTerminalRunning = true;
-            app.floatingTerminalVisible = true;
-            app.floatingTerminalMinimized = false;
-            app.floatingTerminalRestoreRequested = false;
+        // Docked (the default split layout): the dock icon shows/hides the right-hand pane.
+        if (app.previewMode === "docked") {
+            app.previewVisible = !app.previewVisible;
             return;
         }
 
-        if (app.floatingTerminalMinimized) {
-            app.floatingTerminalRestoreRequested = true;
-            app.floatingTerminalMinimized = false;
-            app.floatingTerminalVisible = true;
+        if (app.previewMinimized) {
+            app.previewRestoreRequested = true;
+            app.previewMinimized = false;
+            app.previewVisible = true;
             return;
         }
 
-        app.floatingTerminalVisible = true;
+        app.previewVisible = true;
     }
 
     const tileSize = $state(48);
@@ -30,7 +27,6 @@
 </script>
 
 <div class="dock-layer">
-    <FloatingTerminal />
     <div class="dock" role="toolbar" aria-label="macOS 风格程序坞" style:--tile-size={`${tileSize}px`} style:--dock-height={`${dockHeight}px`}>
         <!-- Ghostty Config icon — always running -->
         <div class="dock-item dock-btn" title="Ghostty Config">
@@ -50,7 +46,7 @@
             title="实时预览终端"
             onclick={activateTerminal}
             aria-label="打开实时预览终端"
-            aria-pressed={app.floatingTerminalVisible}
+            aria-pressed={app.previewVisible}
         >
             <div class="dock-icon-wrap">
                 <!--
@@ -63,11 +59,7 @@
                 -->
                 <GhosttyIcon width={`${ghosttyTileSize}px`} height={`${ghosttyTileSize}px`} />
             </div>
-            {#if app.floatingTerminalRunning}
-                <div class="running-dot"></div>
-            {:else}
-                <div class="running-dot hidden"></div>
-            {/if}
+            <div class="running-dot"></div>
         </button>
     </div>
 </div>
@@ -156,10 +148,6 @@
     position: absolute;
     bottom: 3px;
     bottom: calc(-1 * ((var(--dock-height) - var(--tile-size)) / 2) + (3px * 2));
-}
-
-.running-dot.hidden {
-    visibility: hidden;
 }
 
 .dock-separator {

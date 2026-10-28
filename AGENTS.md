@@ -111,7 +111,7 @@ The ESLint config does not catch all legacy store usage, be deliberate.
 
 ## Terminal preview: DOM-based, not `ghostty-web`
 
-The interactive terminal preview (`src/lib/views/InteractiveTerminalDom.svelte`, surfaced through `FloatingTerminal` + `MacDock`) is a **custom DOM renderer**, not a real terminal emulator. This is a deliberate architecture decision — do not "upgrade" it back to `ghostty-web` (Ghostty's WASM-compiled VT parser) or any other real-emulator surface.
+The interactive terminal preview (`src/lib/views/InteractiveTerminalDom.svelte`, surfaced through `TerminalPreview` + `MacDock`) is a **custom DOM renderer**, not a real terminal emulator. This is a deliberate architecture decision — do not "upgrade" it back to `ghostty-web` (Ghostty's WASM-compiled VT parser) or any other real-emulator surface.
 
 **Why.** The whole point of this tool is *live* config preview: change a setting and watch existing on-screen output re-theme in place. The DOM renderer does this for free — every color, font, and metric is a CSS custom property (`--config-bg`, `--config-fg`, `--config-palette-N`, `--config-font-family`, …), so a config change reactively restyles output that's already rendered, including scrollback and command history.
 
@@ -122,6 +122,25 @@ A real emulator like `ghostty-web` keeps its state inside a surface that must be
 - The fake shell under `src/lib/terminal/` (`filesystem`, `commands`, `completion`, `exec`, `utils`) is a **curated demo surface, not a shell emulator**. Add commands only when they meaningfully showcase config; resist turning it into a general-purpose shell.
 - `ghostty-web` was removed as a dependency along with the old `LivePreview.svelte` / `InteractiveTerminal.svelte` views and the dev-only `/app/live-preview` route. Don't reintroduce them.
 - A genuinely-usable in-browser terminal is a *different product* (a "playground"), not the config preview. If that's ever built, it lives as a separate surface — it does not replace the DOM preview.
+
+### Placement: docked by default, floating on request
+
+`TerminalPreview.svelte` is the **only** surface that hosts `InteractiveTerminalDom`. It renders the same component tree in both placements, so popping the preview out to a window and docking it back keeps scrollback and command history — do not split this back into two components that each mount their own terminal.
+
+`app.previewMode` / `app.previewVisible` in `stores/state.svelte.ts` are placement-neutral; the old `floatingTerminal*` flags are gone. Keep it that way: `docked` is the default split (settings left, preview right, `--preview-width` in `app.css`), and anything new that toggles the preview should go through these two fields rather than adding a third flag.
+
+`Page.svelte`'s header is absolutely positioned against `#content-view`, which is `position: relative`, so it stops at the preview pane instead of running underneath it. If you change those anchors, check that narrow views (the pane collapses below a 900px viewport) still render the header correctly.
+
+### Saying what changed
+
+`stores/preview.svelte.ts` turns each edit into a short-lived chip on the preview: setting name plus `from → to` (`调色板 3` with both hex values for palette slots). The pure half — flattening, diffing, value formatting, first differing palette slot — is `utils/preview.ts`, unit-tested in `preview.test.ts`.
+
+- Call `trackConfig(config)` from an `$effect`; it snapshots (the reactive read) and then does all of its bookkeeping inside `untrack()`. Reading and writing `recentChanges` in the same effect trips Svelte's update-depth guard — keep the `untrack`.
+- One chip per key: a slider drag widens the existing chip rather than stacking every intermediate value.
+- Bulk changes (>4 keys at once: loading a config, resetting everything) push nothing — a wall of chips says nothing useful.
+- The pane also flashes a one-shot accent ring keyed off the newest change id, and the terminal transitions color over 220ms so a restyle reads as a change instead of a snap.
+
+`docs/screenshots/*.jpg` are the Chinese-UI screenshots the README embeds; regenerate them from the running app rather than editing text into an existing image.
 
 ## Local-config bridge: dev/preview only
 

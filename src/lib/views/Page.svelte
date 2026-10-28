@@ -70,7 +70,9 @@
     backdrop-filter: blur(20px);
     position: absolute;
     top: 0;
-    left: var(--sidebar-width);
+    /* Anchored to #content-view (the settings column), not the app window, so the header stops
+       at the preview pane instead of running underneath it. */
+    left: 0;
     right: 0;
     z-index: 1;
 }

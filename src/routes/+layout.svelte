@@ -11,6 +11,7 @@
     import ToastStack from "$lib/components/ToastStack.svelte";
     import SettingsSearch from "$lib/components/SettingsSearch.svelte";
     import MacDock from "$lib/components/MacDock.svelte";
+    import TerminalPreview from "$lib/components/TerminalPreview.svelte";
 
     import github from "$lib/images/tabs/github.svg";
     import ghostty from "$lib/images/tabs/ghostty.webp";
@@ -189,6 +190,7 @@
     <div id="content-view">
         {@render children()}
     </div>
+    <TerminalPreview />
     <MacDock />
     <ModalStack />
     <ToastStack />
@@ -208,6 +210,7 @@
     width: 90%;
     max-width: var(--app-width);
     height: var(--app-height);
+    max-height: calc(100vh - 12px);
     border: 1px solid var(--border-level-1);
     /* box-shadow: 0 0 1px white inset; */
     box-shadow: 0 0 20px -1px rgba(0,0,0,0.7);
@@ -311,6 +314,9 @@
     flex: 1;
     display: flex;
     min-width: 0;
+    /* The page header is absolutely positioned; anchoring it here keeps it inside the settings
+       column when the preview pane occupies the right side. */
+    position: relative;
 }
 
 

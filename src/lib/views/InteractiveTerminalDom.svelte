@@ -327,6 +327,8 @@
     color: var(--config-fg);
     font-family: var(--config-font-family);
     font-size: var(--config-font-size);
+    /* Theme/color edits ease in instead of snapping, so the change in the preview is visible. */
+    transition: color 220ms ease, background-color 220ms ease;
     padding: 10px;
     border-radius: var(--radius-level-3);
     border: 1px solid rgba(0, 0, 0, 0.5);
@@ -349,11 +351,14 @@
     min-height: 100%;
 }
 
+/* Like a real terminal, long lines wrap at the pane edge instead of scrolling sideways — the
+   docked preview is narrow, and a horizontal scrollbar there would hide the right half.
+   `pre-wrap` preserves the spacing the fake shell emits while still breaking at the edge. */
 .line {
     display: flex;
-    white-space: pre;
-    /* line-height: 1.4; */
-    flex-wrap: nowrap;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    flex-wrap: wrap;
     padding: 1px 0;
 }
 
@@ -367,6 +372,15 @@
 .underline {text-decoration: underline;}
 .inverse {background: var(--config-fg); color: var(--config-bg);}
 .href {text-decoration: underline; cursor: pointer;}
+
+.fg,
+.p1,
+.p2,
+.p3,
+.p4,
+.p6 {
+    transition: color 220ms ease;
+}
 
 .fg {color: var(--config-fg);}
 .p1 {color: var(--config-palette-1);}
