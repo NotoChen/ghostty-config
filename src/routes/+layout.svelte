@@ -52,7 +52,7 @@
 </svelte:head>
 
 <!-- eslint-disable-next-line svelte/require-optimized-style-attribute -->
-<div class="app-window" style={cssConfigVars}>
+<div class="app-window" class:preview-floating={app.previewMode === "floating" && app.previewVisible} style={cssConfigVars}>
     <div id="sidebar">
         <div class="sidebar-header">
             <div class="window-actions-container">
@@ -189,6 +189,24 @@
     box-shadow: 0 0 20px -1px rgba(0,0,0,0.7);
     border-radius: var(--radius-level-1);
     overflow: hidden;
+}
+
+/* Floating preview: the terminal is its own window, so the config window moves left and narrows
+   just enough to leave it a column of its own. Without this the two windows would sit on top of
+   each other — separate in the DOM, one rectangle on screen. `--preview-float-width` is published
+   by TerminalPreview from the window's actual width.
+
+   The breakpoint is the width at which 24px margin + a 540px config window + the 24px gap + the
+   terminal window all fit. With the terminal at `defaultFloatingWidth()` (42% of the viewport) that
+   solves to ~1055px, so 1080 leaves a little slack. Narrower than that there is no room for two
+   columns, so this rule stays off and the floating window deliberately cascades over the config
+   window instead of squeezing both into slivers. */
+@media (min-width: 1080px) {
+    .app-window.preview-floating {
+        width: max(540px, min(var(--app-width), calc(100vw - var(--preview-float-width, 680px) - 72px)));
+        margin-left: 24px;
+        margin-right: auto;
+    }
 }
 
 /* .app-window .draggable {

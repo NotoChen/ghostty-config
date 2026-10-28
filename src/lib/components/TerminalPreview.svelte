@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {onMount, tick, untrack} from "svelte";
+    import {tick, untrack} from "svelte";
     import {fade, fly} from "svelte/transition";
     import InteractiveTerminalDom from "$lib/views/InteractiveTerminalDom.svelte";
     import app, {clampPreviewWidth, MAX_PREVIEW_WIDTH, MIN_PREVIEW_WIDTH, savePreview} from "$lib/stores/state.svelte";
@@ -10,6 +10,15 @@
     const DEFAULT_HEIGHT = 480;
     const MIN_WIDTH = 420;
     const MIN_HEIGHT = 280;
+
+    /**
+     * Default floating size. It has to leave the config window room beside it — the two are separate
+     * windows now — so on a narrower screen the terminal window starts proportionally smaller
+     * instead of covering the settings.
+     */
+    function defaultFloatingWidth(viewport: number): number {
+        return Math.round(Math.max(MIN_WIDTH, Math.min(DEFAULT_WIDTH, viewport * 0.42)));
+    }
     const MINIMIZE_DURATION = 280;
     const RESTORE_DURATION = 260;
     // Below this width the docked split has no room left for the settings column, so the preview
@@ -20,13 +29,14 @@
 
     let x = $state(0);
     let y = $state(0);
-    let width = $state(DEFAULT_WIDTH);
+    let width = $state(defaultFloatingWidth(typeof window === "undefined" ? 1440 : window.innerWidth));
     let height = $state(DEFAULT_HEIGHT);
     let dragging = $state(false);
     let resizing = $state(false);
     let resizingDock = $state(false);
     let animating = $state(false);
     let viewportWidth = $state(typeof window === "undefined" ? 1440 : window.innerWidth);
+    let viewportHeight = $state(typeof window === "undefined" ? 900 : window.innerHeight);
     let resizeDirection: ResizeDirection | null = null;
     let dragOffsetX = 0;
     let dragOffsetY = 0;
@@ -39,6 +49,10 @@
     let startLeft = 0;
     let startTop = 0;
     let windowElement = $state<HTMLDivElement | null>(null);
+    /** Has the initial spot been decided? It waits for a tick, so the config window can narrow first. */
+    let placed = false;
+    /** Has the visitor set the window's size? A window they sized keeps it across viewport changes. */
+    let userSized = false;
 
     const isDocked = $derived(app.previewMode === "docked" && viewportWidth >= DOCK_MIN_VIEWPORT);
 
@@ -66,9 +80,130 @@
         });
     });
 
-    onMount(() => {
-        x = Math.max(0, (window.innerWidth - width) / 2);
-        y = Math.max(0, (window.innerHeight - height) / 3);
+    // A viewport change moves the floating window with it. Deferred a tick so `.preview-floating`
+    // has re-laid-out before the config window is measured.
+    $effect(() => {
+        const vw = viewportWidth;
+        const vh = viewportHeight;
+        if (isDocked || !placed) return;
+        untrack(() => {
+            void tick().then(() => {
+                if (!isDocked) placeNextToConfig(vw, vh);
+            });
+        });
+    });
+
+    // The config window narrows itself while the terminal is a separate window (see the
+    // `.preview-floating` rule in +layout.svelte). It has to know how much room to leave, and the
+    // floating width is here — publish it as a custom property rather than duplicating the number.
+    $effect(() => {
+        // Both reads are outside `untrack` — the width is the whole point of this effect, and
+        // reading it inside would publish the *first* width only.
+        const px = `${width}px`;
+        const docked = isDocked;
+        untrack(() => {
+            const root = document.documentElement;
+            if (docked) root.style.removeProperty("--preview-float-width");
+            else root.style.setProperty("--preview-float-width", px);
+        });
+    });
+
+    /**
+     * Where a never-placed window starts: immediately right of the config window, top-aligned with
+     * it, so the two read as two windows on the desktop rather than one rectangle. The layout gives
+     * the config window a narrower column when the preview floats (see +layout.svelte), so measure
+     * it rather than guessing. When the viewport is too small for that, cascade with a visible
+     * offset — still a separate window, never a perfectly-aligned overlay.
+     */
+    function defaultPlacement(): {x: number; y: number} {
+        const appRect = document.querySelector(".app-window")?.getBoundingClientRect();
+        const gap = 24;
+        const fallbackTop = appRect ? appRect.top + 56 : Math.max(16, (viewportHeight - height) / 3);
+
+        if (appRect) {
+            const right = Math.round(appRect.right + gap);
+            if (right + width <= viewportWidth - 8) {
+                return {x: right, y: Math.max(8, Math.round(appRect.top + 56))};
+            }
+            // No room beside it: sit over the config window's lower-right, offset on both axes so it
+            // still reads as a window on top rather than a continuation of the one below.
+            return {
+                x: Math.max(0, Math.min(viewportWidth - width - 24, Math.round(appRect.right - width * 0.35))),
+                y: Math.max(0, Math.min(viewportHeight - height - 24, Math.round(fallbackTop + 80))),
+            };
+        }
+
+        return {x: Math.max(0, Math.round((viewportWidth - width) / 2)), y: Math.max(0, Math.round(fallbackTop))};
+    }
+
+    /** Keep a (restored or resized) window fully on screen. */
+    function clampToViewport(nextX: number, nextY: number, vw = viewportWidth, vh = viewportHeight): {x: number; y: number} {
+        return {
+            x: Math.max(0, Math.round(Math.min(nextX, vw - width))),
+            y: Math.max(0, Math.round(Math.min(nextY, vh - height))),
+        };
+    }
+
+    /** Would a window at `nextX`/`nextY` land on the config window? */
+    function coversConfigWindow(nextX: number, nextY: number): boolean {
+        const appRect = document.querySelector(".app-window")?.getBoundingClientRect();
+        if (!appRect) return false;
+        return nextX < appRect.right && nextX + width > appRect.left
+            && nextY < appRect.bottom && nextY + height > appRect.top;
+    }
+
+    /**
+     * Put the window where it belongs for this viewport: on screen, and clear of the config window.
+     * A spot that still satisfies both is kept — it is the visitor's, or a default that still holds.
+     * One that doesn't is re-derived from the config window's current position.
+     */
+    function position(vw: number, vh: number) {
+        const clamped = clampToViewport(x, y, vw, vh);
+        const spot = coversConfigWindow(clamped.x, clamped.y) ? defaultPlacement() : clamped;
+        if (spot.x === x && spot.y === y) return;
+        x = spot.x;
+        y = spot.y;
+        app.previewX = x;
+        app.previewY = y;
+    }
+
+    /**
+     * Keep the window fitting beside the config window. A window the visitor never sized follows the
+     * viewport the way the default size does; otherwise a browser window narrowed from 1600px to
+     * 1200px would leave a 672px terminal with nowhere to sit but on top of the settings.
+     */
+    function placeNextToConfig(vw: number, vh: number) {
+        if (!userSized) {
+            const fitted = defaultFloatingWidth(vw);
+            if (fitted !== width) {
+                width = fitted;
+                // The config window re-narrows from the new `--preview-float-width`; measure after.
+                void tick().then(() => position(vw, vh));
+                return;
+            }
+        }
+        position(vw, vh);
+    }
+
+    // The initial spot is decided once, after the first layout: at mount the config window still
+    // owns the full width on the popped-out first render, so measuring then would put the terminal
+    // on top of it. `tick()` lets `.preview-floating` narrow it first.
+    $effect(() => {
+        if (isDocked || placed) return;
+        untrack(() => {
+            void tick().then(() => {
+                if (isDocked || placed) return;
+                placed = true;
+
+                // Only a spot the visitor chose is restored. A spot we computed ourselves is
+                // re-derived, because it was relative to a layout that may not exist any more.
+                if (app.previewUserPlaced && app.previewX >= 0 && app.previewY >= 0) {
+                    x = app.previewX;
+                    y = app.previewY;
+                }
+                placeNextToConfig(viewportWidth, viewportHeight);
+            });
+        });
     });
 
     // Record what the editor changed so the chips in the preview can name the difference.
@@ -203,6 +338,14 @@
         }
 
         function onUp() {
+            // Remember where the window was left, so it comes back there next visit. Writing the
+            // store fields here (rather than in the move handler) keeps one save per gesture.
+            if (!isDocked) {
+                if (resizing) userSized = true;
+                app.previewUserPlaced = true;
+                app.previewX = x;
+                app.previewY = y;
+            }
             dragging = false;
             resizing = false;
             resizeDirection = null;
@@ -379,7 +522,12 @@
     }
 </script>
 
-<svelte:window onresize={() => viewportWidth = window.innerWidth} />
+<svelte:window
+    onresize={() => {
+        viewportWidth = window.innerWidth;
+        viewportHeight = window.innerHeight;
+    }}
+/>
 
 <div
     bind:this={windowElement}

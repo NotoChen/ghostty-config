@@ -133,15 +133,26 @@ Two things are listed but only partially reproducible, so the row text carries t
 
 `+layout.svelte` still owns the live config's colors; a second config's vars come from `utils/configVars.ts` for the side-by-side view.
 
-### Placement: docked by default, floating on request
+### Placement: two windows by default
+
+As in Ghostty itself, the config window and the terminal are **separate windows**: `floating` is the default, and `docked` (one window split into settings + preview) is the alternative a visitor can pick. This is not cosmetic — the user explicitly rejected the split-pane default, so don't quietly flip it back.
 
 `TerminalPreview.svelte` is the **only** surface that hosts `InteractiveTerminalDom`. It renders the same component tree in both placements, so popping the preview out to a window and docking it back keeps scrollback and command history — do not split this back into two components that each mount their own terminal.
 
-`app.previewMode` / `app.previewVisible` / `app.previewWidth` in `stores/state.svelte.ts` are placement-neutral; the old `floatingTerminal*` flags are gone. Keep it that way: `docked` is the default split (settings left, preview right), and anything new that toggles the preview should go through these fields rather than adding another flag.
+`app.previewMode` / `previewVisible` / `previewWidth` / `previewX` / `previewY` / `previewUserPlaced` in `stores/state.svelte.ts` are placement-neutral, and anything new that toggles the preview goes through these fields rather than adding another flag. Placement is a per-visitor convenience persisted in localStorage under `ghostty-config:preview:v2` (never in the config, never exported); `savePreview()` is called from an effect in `TerminalPreview`. The `:v2` suffix exists because a stored `docked` from the old default is indistinguishable from never having touched it — bump the key, don't migrate, if the default changes again.
 
-The docked width has exactly one source of truth: `app.previewWidth`, set as the pane's inline `width` and changed only by the divider (`startDockResize`, plus arrow keys for keyboard users) or `clampPreviewWidth`. Placement — mode, width, visibility — is a per-visitor convenience persisted in localStorage under `ghostty-config:preview` (never in the config, never exported); `savePreview()` is called from an effect in `TerminalPreview` that reads the fields through the store write itself.
+Position has two levels of truth. `previewX`/`previewY` always hold the current spot, but only `previewUserPlaced` (set by a drag/resize, in `onUp`) makes that spot come back on the next visit. A spot the component computed itself is re-derived on every load, because "beside the config window" depends on a layout that may be gone: restoring a computed x from a 1600px visit on a 1280px screen parks the terminal flush against, or on top of, the settings. `-1` means "never placed".
 
-`Page.svelte`'s header is absolutely positioned against `#content-view`, which is `position: relative`, so it stops at the preview pane instead of running underneath it. If you change those anchors, check that narrow views (the pane collapses below a 900px viewport) still render the header correctly.
+The two windows must not overlap, and that takes two halves:
+
+- **The component** publishes its own width as `--preview-float-width` on `document.documentElement` (from an effect that reads `width` *outside* `untrack`, or it publishes only the first value), and positions itself with `defaultPlacement()` — measured off `.app-window` and set just to its right with a 24px gap. `clampToViewport()` keeps a stored or resized window on screen, and `coversConfigWindow()` re-derives any spot that would land on the settings.
+- **`+layout.svelte`** narrows `.app-window.preview-floating` to `calc(100vw - var(--preview-float-width) - 72px)`. Never hardcode the window width into that calc — it was guessed wrong twice; let the component say how much room it needs. Its `min-width: 1040px` is the width at which a 540px settings column and the floating window still both fit; below it the rule stays off and the terminal cascades over the config window on purpose rather than squeezing both into slivers.
+
+Placement runs *after* the layout settles: the initial spot defers through `tick()` because at mount the config window still owns the full width, and measuring then puts the terminal on top of it. Viewport changes do the same, and a window the visitor never resized follows the viewport's default width (`defaultFloatingWidth`); once they resize it, `userSized` keeps their size even when that means the two no longer fit side by side.
+
+The docked width has exactly one source of truth: `app.previewWidth`, set as the pane's inline `width` and changed only by the divider (`startDockResize`, plus arrow keys for keyboard users) or `clampPreviewWidth`. `dockWidthLimit(viewport)` caps it so the settings column keeps ~420px; the clamp effect reads `viewportWidth` on purpose, since `isDocked` stays true across a resize and would otherwise never re-run. Below `DOCK_MIN_VIEWPORT` the docked mode is not used at all.
+
+`Page.svelte`'s header is absolutely positioned against `#content-view`, which is `position: relative`, so it stops at the preview pane instead of running underneath it. If you change those anchors, check that narrow views still render the header correctly.
 
 ### Saying what changed
 
