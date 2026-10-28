@@ -7,8 +7,35 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 2
+    groups:
+      # One PR per dependency class instead of one per package — the weekly diff stays reviewable.
+      development:
+        dependency-type: "development"
+        update-types: ["minor", "patch"]
+      production:
+        dependency-type: "production"
+        update-types: ["minor", "patch"]
+    ignore:
+      # SvelteKit, Vite, Svelte and Vitest are pinned to majors that are known to build and deploy
+      # correctly together (see the Pages CSS-preload note); a major bump is verified by hand before
+      # the range moves, not merged straight from a bot PR.
+      - dependency-name: "@sveltejs/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "vite"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "svelte"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "vitest"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 1
+    groups:
+      actions:
+        patterns: ["*"]
