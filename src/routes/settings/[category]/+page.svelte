@@ -36,8 +36,9 @@
     import {type DropdownOption, type FeatureDef, type PillOption, type SettingsRegistry, type SpecialValue} from "$lib/settings/types";
 
 
-    const category = $derived(navigation.find(c => c.id === $page.params.category));
-    const title = $derived(category?.name ?? $page.params.category);
+    const {params} = $derived($page);
+    const category = $derived(navigation.find(c => c.id === params.category));
+    const title = $derived(category?.name ?? params.category);
 
     // Color editors display the *effective* color (override > theme > default) so the picker
     // always agrees with the preview; edits write an override into config, and reset/right-click
@@ -88,9 +89,9 @@
 <Page {title}>
     {#if category}
         {#if category.id === "fonts"}
-            <Admonition size="1.5rem">The font playground has moved to a <a href={resolve("/app/font-playground")}>separate page</a>.</Admonition>
+            <Admonition size="1.5rem">字体游乐场已移至 <a href={resolve("/app/font-playground")}>独立页面</a>。</Admonition>
         {:else if category.id === "colors"}
-            <Admonition size="1.5rem">You can reset a color to its default value by right clicking!</Admonition>
+            <Admonition size="1.5rem">右键单击颜色可将其恢复为默认值！</Admonition>
         {/if}
         {#each category.groups as group (group.id)}
             <Group title={group.name} note={"note" in group ? group.note : undefined}>
@@ -109,7 +110,7 @@
                         name={setting.name}
                         note={setting.note}
                         // filter out the current platform from the badge list since it's already obvious from the UI
-                        platform={setting?.platform?.filter(p => p !== title?.toLowerCase())}
+                        platform={setting?.platform?.filter(p => p !== params.category)}
                         since={setting.since}
                         description={setting.description}
                         isNonDefault={isNonDefault(settingId)}
@@ -117,7 +118,7 @@
                         inline={widget?.type !== "palette"}
                         onReset={() => {
                             resetSetting(settingId);
-                            success(isThemedColor(settingId) ? `${setting.name} now follows the theme` : `${setting.name} reset to default`);
+                            success(isThemedColor(settingId) ? `${setting.name} 已改为跟随主题` : `${setting.name} 已恢复默认值`);
                         }}
                     >
                         {#if widget}
@@ -135,10 +136,10 @@
                             {:else if widget.type === "theme"}
                                 <Theme bind:value={config[settingId] as string} options={widget.options as Array<DropdownOption | string>} />
                             {:else if widget.type === "color"}
-                                <Color defaultValue={setting.default as HexColor} bind:value={() => displayColor(settingId) as HexColor, (v: HexColor) => setSetting(settingId, v)} resetMessage={isThemedColor(settingId) ? `${setting.name} now follows the theme` : undefined} />
+                                <Color defaultValue={setting.default as HexColor} bind:value={() => displayColor(settingId) as HexColor, (v: HexColor) => setSetting(settingId, v)} resetMessage={isThemedColor(settingId) ? `${setting.name} 已改为跟随主题` : undefined} />
                             {:else if widget.type === "palette"}
                                 <!-- Displays the effective palette; each edit writes a single-index override so un-touched theme colors never enter config (and thus never serialize). -->
-                                <Palette defaultValue={setting.default as HexColor[]} value={effectiveColors().palette as HexColor[]} onSet={(idx: number, c: HexColor) => {config.palette[idx] = c;}} resetMessage={isThemedColor(settingId) ? "Color now follows the theme" : undefined} swatchTooltip={paletteSwatchTooltip} />
+                                <Palette defaultValue={setting.default as HexColor[]} value={effectiveColors().palette as HexColor[]} onSet={(idx: number, c: HexColor) => {config.palette[idx] = c;}} resetMessage={isThemedColor(settingId) ? "颜色已改为跟随主题" : undefined} swatchTooltip={paletteSwatchTooltip} />
                             {:else if widget.type === "repeatable-text"}
                                 <RepeatableText bind:value={config[settingId] as string[]} placeholder={widget.placeholder} canReorder={widget.canReorder} />
                             {:else if widget.type === "feature-list"}
@@ -150,7 +151,7 @@
                             {:else if widget.type === "dual-number"}
                                 <DualNumber bind:value={config[settingId] as string} labels={widget.labels as [string, string]} min={widget.min} max={widget.max} step={widget.step} />
                             {:else if widget.type === "custom-color"}
-                                <CustomColor bind:value={() => displayColor(settingId), (v: string) => setSetting(settingId, v)} presets={widget.presets as SpecialValue[]} widget={widget.widget} default={setting.default as HexColor} resetMessage={isThemedColor(settingId) ? `${setting.name} now follows the theme` : undefined} />
+                                <CustomColor bind:value={() => displayColor(settingId), (v: string) => setSetting(settingId, v)} presets={widget.presets as SpecialValue[]} widget={widget.widget} default={setting.default as HexColor} resetMessage={isThemedColor(settingId) ? `${setting.name} 已改为跟随主题` : undefined} />
                             {:else if widget.type === "custom-number"}
                                 <CustomNumber bind:value={config[settingId] as string} presets={widget.presets as SpecialValue[]} min={widget.min} max={widget.max} step={widget.step} size={widget.size} placeholder={widget.placeholder} integer={widget.integer} widget={widget.widget} />
                             {:else if widget.type === "scroll-multiplier"}
@@ -169,7 +170,7 @@
             </Group>
         {/each}
     {:else}
-        <h1>What Happened?</h1>
-        <p>You shouldn't be here! If you followed a link, please report the bug on GitHub. Otherwise, go ahead and start browsing on the left.</p>
+        <h1>发生什么了？</h1>
+        <p>这里不该出现。如果你是点击链接进来的，请在 GitHub 上反馈这个 bug；否则可以直接从左侧开始浏览。</p>
     {/if}
 </Page>

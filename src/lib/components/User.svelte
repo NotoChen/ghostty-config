@@ -7,17 +7,19 @@
     const {route = "/", name = "Ghostty Config"} = $props();
     const path = $derived(page.url.pathname);
 
-    const selected = $derived(path === route);
+    // `resolve` carries the deploy base, so compare against it rather than the bare route.
+    const href = $derived(resolve(route as Pathname));
+    const selected = $derived(path === href);
 </script>
 
 
-<a href={resolve(route as Pathname)} class="user-tab" class:selected>
+<a {href} class="user-tab" class:selected>
     <div class="user-avatar">
-        <img src={logo} alt="Ghostty Config Logo" />
+        <img src={logo} alt="Ghostty Config 标志" />
     </div>
     <div class="user-label">
         <div class="user-name">{name}</div>
-        <div class="user-subtext">by @zerebos</div>
+        <div class="user-subtext">by @NotoChen</div>
     </div>
 </a>
 

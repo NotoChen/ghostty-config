@@ -17,6 +17,7 @@
 
     import sync from "$lib/images/tabs/sync.webp";
     import calligraphy from "$lib/images/tabs/font-playground.webp";
+    import terminal from "$lib/images/tabs/terminal.webp";
 
     import config from "$lib/stores/config.svelte";
     import {numberCodec} from "$lib/settings/codecs";
@@ -92,46 +93,46 @@
             <User route="/" />
             <!-- <Gap />
             <Tab route="/settings/application">
-                {#snippet icon()}<img src={application} alt="Application Settings" />{/snippet}
+                {#snippet icon()}<img src={application} alt="应用设置" />{/snippet}
                 Application
             </Tab>
             <Tab route="/settings/clipboard">
-                {#snippet icon()}<img src={clipboard} alt="Clipboard Settings" />{/snippet}
+                {#snippet icon()}<img src={clipboard} alt="剪贴板设置" />{/snippet}
                 Clipboard
             </Tab>
             <Tab route="/settings/window">
-                {#snippet icon()}<img src={window} alt="Window Settings" />{/snippet}
+                {#snippet icon()}<img src={window} alt="窗口设置" />{/snippet}
                 Window
             </Tab>
             <Gap />
             <Tab route="/settings/colors">
-                {#snippet icon()}<img src={colors} alt="Color Settings" />{/snippet}
+                {#snippet icon()}<img src={colors} alt="颜色设置" />{/snippet}
                 Colors
             </Tab>
             <Tab route="/settings/fonts">
-                {#snippet icon()}<img src={fonts} alt="Font Settings" />{/snippet}
+                {#snippet icon()}<img src={fonts} alt="字体设置" />{/snippet}
                 Fonts
             </Tab>
             <Gap />
             <Tab route="/settings/keybinds">
-                {#snippet icon()}<img src={keybinds} alt="Keybind Settings" />{/snippet}
+                {#snippet icon()}<img src={keybinds} alt="快捷键设置" />{/snippet}
                 Keybinds
             </Tab>
             <Tab route="/settings/mouse">
-                {#snippet icon()}<img src={mouse} alt="Mouse Settings" />{/snippet}
+                {#snippet icon()}<img src={mouse} alt="鼠标设置" />{/snippet}
                 Mouse
             </Tab>
             <Gap />
             <Tab route="/settings/gtk">
-                {#snippet icon()}<div class="icon-wrapper"><img src={gtk} alt="GTK Settings" /></div>{/snippet}
+                {#snippet icon()}<div class="icon-wrapper"><img src={gtk} alt="GTK 设置" /></div>{/snippet}
                 GTK
             </Tab>
             <Tab route="/settings/linux">
-                {#snippet icon()}<img src={linux} alt="Linux Settings" />{/snippet}
+                {#snippet icon()}<img src={linux} alt="Linux 设置" />{/snippet}
                 Linux
             </Tab>
             <Tab route="/settings/macos">
-                {#snippet icon()}<img src={macos} alt="MacOS Settings" />{/snippet}
+                {#snippet icon()}<img src={macos} alt="macOS 设置" />{/snippet}
                 macOS
             </Tab> -->
             {#each tabGroups as group, i (i)}
@@ -157,26 +158,30 @@
             {/each}
             <Gap expand={true} />
             <Tab route="/app/import-export">
-                {#snippet icon()}<img src={sync} alt="Settings Sync" />{/snippet}
-                Import & Export
+                {#snippet icon()}<img src={sync} alt="设置同步" />{/snippet}
+                导入与导出
+            </Tab>
+            <Tab route="/app/local-config">
+                {#snippet icon()}<img src={terminal} alt="本地配置" />{/snippet}
+                本地配置
             </Tab>
             <Tab route="/app/font-playground">
-                {#snippet icon()}<img src={calligraphy} alt="Font Playground" />{/snippet}
-                Font Playground
+                {#snippet icon()}<img src={calligraphy} alt="字体游乐场" />{/snippet}
+                字体游乐场
             </Tab>
             <!-- {#if dev}
             <Tab route="/app/dropdown-debug">
-                {#snippet icon()}<img src={ghostty} alt="Dropdown Debug" />{/snippet}
+                {#snippet icon()}<img src={ghostty} alt="下拉框调试" />{/snippet}
                 Dropdown Debug
             </Tab>
             {/if} -->
             <Gap expand={true} />
-            <Tab route="https://github.com/zerebos/ghostty-config">
-                {#snippet icon()}<div class="icon-wrapper github"><img src={github} alt="Ghostty Config GitHub" /></div>{/snippet}
+            <Tab route="https://github.com/NotoChen/ghostty-config">
+                {#snippet icon()}<div class="icon-wrapper github"><img src={github} alt="Ghostty Config 的 GitHub" /></div>{/snippet}
                 GitHub
             </Tab>
             <Tab route="https://ghostty.org/">
-                {#snippet icon()}<img src={ghostty} alt="Ghostty Website" />{/snippet}
+                {#snippet icon()}<img src={ghostty} alt="Ghostty 官网" />{/snippet}
                 Ghostty
             </Tab>
         </SettingsSearch>

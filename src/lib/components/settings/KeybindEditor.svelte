@@ -12,6 +12,8 @@
 
     } from "$lib/utils/keybinds";
     import {createTooltipAttachment} from "$lib/attachments/tooltip";
+    import {isRecordingKey, stepCaps, stepFromEvent} from "$lib/utils/keycaps";
+    import {modifierChip} from "$lib/utils/platform";
     import {fly, scale} from "svelte/transition";
     import Group from "./Group.svelte";
     import Item from "./Item.svelte";
@@ -29,6 +31,13 @@
     }
 
     const {value = "", onsave, oncancel}: Props = $props();
+
+    const PREFIX_HINTS: Record<string, string> = {
+        all: "应用于所有终端界面",
+        global: "系统范围快捷键（仅 macOS）",
+        unconsumed: "不消耗按键，匹配后仍传给终端",
+        performable: "仅在该操作当前可执行时匹配"
+    };
 
     type Modifier = string;
 
@@ -105,6 +114,21 @@
         );
     }
 
+    // Pressing a combo in the key field records it — key name *and* modifiers, so the checkboxes
+    // below always reflect the keys actually pressed. Single printable characters without
+    // Ctrl/Alt/Cmd are left alone so names like `physical:five` stay typeable.
+    function captureKey(event: KeyboardEvent, stepIndex: number) {
+        if (!isRecordingKey(event)) return;
+        const recorded = stepFromEvent(event);
+        if (!recorded) {
+            // Only modifiers so far — wait for the real key rather than typing nothing.
+            event.preventDefault();
+            return;
+        }
+        event.preventDefault();
+        steps = steps.map((step, index) => index === stepIndex ? recorded : step);
+    }
+
     function addSequenceStep() {
         if (steps.length >= 4) return;
         if (prefixes.includes("global") || prefixes.includes("all")) return;
@@ -170,9 +194,9 @@
     const isAddStepDisabled = $derived(hasGlobalOrAllPrefix || hasMaxSequenceSteps);
 
     function getAddStepTooltipMessage() {
-        if (hasGlobalOrAllPrefix) return "Global/all keybinds cannot be sequences";
-        if (hasMaxSequenceSteps) return "Maximum of 4 sequence steps";
-        return "Add sequence step";
+        if (hasGlobalOrAllPrefix) return "global/all 快捷键不能是按键序列";
+        if (hasMaxSequenceSteps) return "按键序列最多 4 步";
+        return "添加序列步骤";
     }
 
     const addStepTooltipAttachment = createTooltipAttachment(getAddStepTooltipMessage);
@@ -181,10 +205,10 @@
 
 <div class="editor" in:fly={{y: 30, duration: 200}}>
     <Group>
-        <Item name="Prefixes">
+        <Item name="前缀" note="all 让快捷键作用于所有终端界面；global 使其成为系统范围快捷键（仅 macOS）；unconsumed 表示匹配后仍把按键传给终端；performable 表示仅当该操作当前可执行时才匹配。">
             <div class="prefix-row">
                 {#each VALID_PREFIXES as prefix (prefix)}
-                    <label>
+                    <label title={PREFIX_HINTS[prefix] ?? ""}>
                         <Checkbox checked={prefixes.includes(prefix)} onchange={() => togglePrefix(prefix)} />
                         {prefix}
                     </label>
@@ -192,7 +216,7 @@
             </div>
         </Item>
     </Group>
-    <Group title="Trigger" borderless>
+    <Group title="触发器" borderless>
         <div class="sequence">
             <datalist id="key-options">
                 {#each KEY_NAMES as keyName (keyName)}
@@ -207,24 +231,43 @@
                         </button>
                     {/if}
 
-                    <Item name={steps.length > 1 ? `Key Name ${index + 1}` : "Key Name"} note={steps.length > 1 ? `The key to use for step ${index + 1} in the sequence.` : "The key to use for this action."}>
+                    <Item
+                        name={steps.length > 1 ? `按键名 ${index + 1}` : "按键名"}
+                        note={steps.length > 1
+                            ? `序列中第 ${index + 1} 步使用的按键。直接按下组合键即可录入。`
+                            : "直接按下组合键即可录入，修饰键会自动勾选；也可手动输入按键名（如 physical:five）。"}
+                    >
                         <div class="key-entry">
                             <input
                                 type="text"
-                                placeholder="key"
+                                placeholder="按下按键…"
                                 bind:value={step.key}
                                 list="key-options"
                                 oninput={(event) => updateStepKey(index, event.currentTarget.value)}
+                                onkeydown={(event) => captureKey(event, index)}
+                                {@attach (node: HTMLInputElement) => {
+                                    // Focus the first step so the editor is ready to record a combo
+                                    // the moment it opens.
+                                    if (index === 0) node.focus();
+                                }}
                             />
+                            <span class="key-caps">
+                                {#each stepCaps(step).caps as cap, capIndex (capIndex)}
+                                    <kbd class:modifier={capIndex < stepCaps(step).caps.length - 1}>{cap}</kbd>
+                                {/each}
+                                {#if stepCaps(step).dedicated}
+                                    <span class="key-tag">专用键</span>
+                                {/if}
+                            </span>
                         </div>
                     </Item>
                     <Separator />
-                    <Item name="Modifiers">
+                    <Item name="修饰键" note="配置里写成 super/ctrl/alt/shift；方框前的符号是它们在本机键盘上的实体键（⌘ 为 Command）。">
                         <div class="modifiers">
                             {#each VALID_MODIFIERS as modifier (modifier)}
                                 <label>
                                     <Checkbox checked={step.modifiers.includes(modifier)} onchange={() => toggleModifier(index, modifier)} />
-                                    <span>{modifier}</span>
+                                    <span>{modifierChip(modifier)}</span>
                                 </label>
                             {/each}
                         </div>
@@ -246,8 +289,8 @@
             </button>
         </div>
     </Group>
-    <Group title="Action">
-        <Item name="Name" note="The action to perform when the keybind is triggered.">
+    <Group title="操作">
+        <Item name="名称" note="按下快捷键时要执行的操作。">
             <Dropdown
                 bind:value={actionName}
                 options={ACTION_DEFINITIONS.map((action) => ({
@@ -262,7 +305,7 @@
 
         {#if getCurrentAction()?.type !== "none"}
             <Separator />
-            <Item name="Argument" note="Optional argument for the action, format depends on the action type.">
+            <Item name="参数" note="操作的参数，可选，格式取决于操作类型。">
             {#if getCurrentAction()?.type === "enum"}
                 <Dropdown bind:value={actionArg} options={dropdownOptions} />
             {:else if getCurrentAction()?.type === "number"}
@@ -280,16 +323,16 @@
                         value: direction
                     }))}
                 />
-                <Number bind:value={resizeAmount} min={0} step={1} placeholder="pixels" nullable />
+                <Number bind:value={resizeAmount} min={0} step={1} placeholder="像素" nullable />
             {:else if getCurrentAction()?.type === "text"}
-                <Text bind:value={actionArg} placeholder="Zig string literal" />
+                <Text bind:value={actionArg} placeholder="Zig 字符串字面量" />
             {:else if getCurrentAction()?.type === "free"}
-                <Text bind:value={actionArg} placeholder="raw sequence" />
+                <Text bind:value={actionArg} placeholder="原始序列" />
             {/if}
             </Item>
         {/if}
      </Group>
-    <Group title="Result" borderless>
+    <Group title="结果" borderless>
         <div class="preview-box">
             <div class="row">
                     <span class="p4">{getTrigger()}</span>
@@ -306,13 +349,13 @@
         {/if}
     </Group>
     <div class="actions">
-        <Button onclick={close}>Cancel</Button>
+        <Button onclick={close}>取消</Button>
         <Button
             primary
             onclick={handleSave}
             disabled={getErrors().length > 0}
         >
-            Done
+            完成
         </Button>
     </div>
 </div>
@@ -366,22 +409,58 @@
     .modifiers {
         display: flex;
         flex-wrap: wrap;
-        gap: 16px;
+        gap: 12px;
     }
 
     .modifiers label {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
         color: var(--font-color);
         font-size: 0.75rem;
         cursor: pointer;
+        white-space: nowrap;
     }
 
     .key-entry {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
+    }
+
+    .key-caps {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        flex-wrap: wrap;
+    }
+
+    .key-caps kbd {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 1.6em;
+        padding: 2px 6px;
+        border-radius: var(--radius-level-5);
+        background: var(--bg-level-4);
+        border: 1px solid var(--border-level-3);
+        border-bottom-width: 2px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.75rem;
+        line-height: 1.2;
+    }
+
+    .key-caps kbd.modifier {
+        color: var(--color-input-accent);
+    }
+
+    .key-tag {
+        padding: 1px 5px;
+        border-radius: var(--radius-level-5);
+        background: var(--bg-level-4);
+        border: 1px solid var(--border-level-2);
+        color: var(--font-color-muted);
+        font-size: 0.7rem;
     }
 
     .key-entry input {

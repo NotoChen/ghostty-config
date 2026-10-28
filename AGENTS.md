@@ -123,6 +123,20 @@ A real emulator like `ghostty-web` keeps its state inside a surface that must be
 - `ghostty-web` was removed as a dependency along with the old `LivePreview.svelte` / `InteractiveTerminal.svelte` views and the dev-only `/app/live-preview` route. Don't reintroduce them.
 - A genuinely-usable in-browser terminal is a *different product* (a "playground"), not the config preview. If that's ever built, it lives as a separate surface — it does not replace the DOM preview.
 
+## Local-config bridge: dev/preview only
+
+`/app/local-config` compares the config on this machine with the one the editor is building, and can write the editor's config back. A browser cannot read `~/Library/Application Support/com.mitchellh.ghostty/config.ghostty`, so `scripts/vite-plugin-local-config.ts` serves it over `GET/POST /__ghostty/local-config` from the Vite **dev and preview** servers. `vite build` emits no such route, so the deployed static site has no file access at all and the page shows an unavailable notice instead.
+
+Rules that must stay true:
+
+- **Loopback only.** The plugin rejects non-loopback sockets and any `Origin` that isn't `localhost`/`127.0.0.1`. POST additionally requires `application/json` (which forces a CORS preflight the endpoint never answers). Do not add CORS headers or relax the origin check — this endpoint rewrites a real user file.
+- **Never write without a backup.** `writeLocalConfig()` always copies to `*.bak-<timestamp>` first and writes through a `.tmp` file + rename, so a crash can't leave a truncated config.
+- **Validation runs against the user's real `ghostty` binary** (`+validate-config`). A file that *already* contains an invalid line (e.g. the 1.4-removed `link`) is allowed to be written as long as the write doesn't introduce a new offender; anything newly introduced is rejected.
+- **Only the app's non-default values are written.** `mergeConfigText()` rewrites matching lines in place and appends missing ones; lines the editor leaves at default are untouched unless the user explicitly opts into commenting them out. Do not make a plain write delete customizations the user never loaded.
+- **A generated block must read like a hand-written one.** Keys that have to be appended are grouped by the navigation section they live in and get a one-line Chinese comment — `# ========== 面板 · 分组 ==========` then `# 设置名：描述首句` per key — via `src/lib/utils/configComments.ts` (`annotatedConfigText()` does the same for the plain export/下载 path; share URLs keep the bare `serialize()` output). Comments come from the registry `name`/`description`, so they stay in sync with the setting text instead of being a second translation to maintain.
+- The client half is `src/lib/stores/localConfig.svelte.ts`; diffing and merging are pure functions in `src/lib/utils/configDiff.ts` (unit-tested). Keep write-side decision logic there, not in the page.
+- `src/lib/utils/configVars.ts` renders a *second* config's `--config-*` vars for the side-by-side preview. `+layout.svelte` remains the single funnel for the live config's colors — this module exists only so a non-live config can be shown without touching global state.
+
 ## Other conventions
 
 **Async handlers**: use `withPendingGuard(fn)` from `$lib/utils/debounce` for anything that must not fire concurrently. Use `debounce(fn, ms)` (leading-edge by default in this codebase) for rate-limiting sync actions.

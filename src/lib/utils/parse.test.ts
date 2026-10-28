@@ -80,6 +80,16 @@ describe("parse() palette (indexed, still special)", () => {
     });
 });
 
+describe("parse() legacy aliases", () => {
+    it("maps a retired key onto the registry entry that replaced it", () => {
+        expect(parse("scrollback-limit = 100000000").scrollbackLimitBytes).toBe("100000000");
+    });
+
+    it("does not emit the retired key name", () => {
+        expect(parse("scrollback-limit = 100000000").scrollbackLimit).toBeUndefined();
+    });
+});
+
 describe("parse -> serialize round-trip", () => {
     it("survives scalars, repeatables, and keybinds", () => {
         const text = "font-size = 18\nfont-family = JetBrainsMono NF\nfont-family = Symbols Nerd Font\nkeybind = ctrl+a=select_all";

@@ -36,7 +36,7 @@
         event.stopPropagation();
         if (defaultValue !== undefined) {
             value = defaultValue;
-            success(resetMessage ?? "Color reset to default");
+            success(resetMessage ?? "颜色已恢复默认值");
         }
     }
 
@@ -58,7 +58,7 @@
 <div class="shadow" onclick={click} transition:fade={{duration: 200}} role="none" {@attach toAppWindow}></div>
 <div class="picker-container" transition:fly={{y: 32, duration: 200}} {@attach toAppWindow}>
     <ColorPicker bind:value />
-    <button class="close" onclick={click} type="button" title="Close"><span>×</span></button>
+    <button class="close" onclick={click} type="button" title="关闭"><span>×</span></button>
 </div>
 {/if}
 

@@ -4,7 +4,7 @@ import {err, ok} from "../utils";
 
 
 const command: Command = {
-    desc: "Create an empty file or update timestamp",
+    desc: "创建空文件或更新时间戳",
     usage: "<file>",
     fn(args, ctx) {
         if (!args[0]) return err("touch: missing file operand");

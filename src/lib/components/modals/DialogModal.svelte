@@ -55,7 +55,7 @@
             {/if}
             <h2>{title}</h2>
             {#if onclose}
-                <button type="button" class="close-btn" onclick={onclose} aria-label="Dismiss">&times;</button>
+                <button type="button" class="close-btn" onclick={onclose} aria-label="关闭">&times;</button>
             {/if}
         </header>
 

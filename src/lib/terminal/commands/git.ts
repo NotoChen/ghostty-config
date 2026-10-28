@@ -18,11 +18,11 @@ const gitState = {
 
 
 const command: Command = {
-    desc: "Version control (curated preview)",
+    desc: "版本控制（精选预览）",
     usage: "<subcommand>",
     details: [
-        "Supported subcommands: status, log, diff, branch, add, commit",
-        "This is a curated demo — output is simulated for preview purposes.",
+        "支持的子命令：status、log、diff、branch、add、commit",
+        "这是精选演示，输出为模拟内容，仅供预览。",
     ],
     fn(args) {
         const sub = args[0];

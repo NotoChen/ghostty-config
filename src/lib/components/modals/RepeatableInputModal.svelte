@@ -95,13 +95,13 @@
 
     {#if hasDuplicates && !allowDuplicates}
         <Admonition>
-            The following values are duplicated:
+            以下值重复：
             <ul>
                 {#each Array.from(duplicateValues) as value, i (i)}
                     <li>{value}</li>
                 {/each}
             </ul>
-            Please remove or modify the duplicate values before saving.
+            保存前请删除或修改重复的值。
         </Admonition>
     {/if}
 
@@ -121,14 +121,14 @@
                 <Text bind:value={draftValues[index]} {placeholder} />
                 <div class="row-actions">
                     {#if canReorder}
-                        <Button icon type="button" title="Move up" onclick={() => moveUp(index)} disabled={index === 0}>
+                        <Button icon type="button" title="上移" onclick={() => moveUp(index)} disabled={index === 0}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6" /></svg>
                         </Button>
-                        <Button icon type="button" title="Move down" onclick={() => moveDown(index)} disabled={index === draftValues.length - 1}>
+                        <Button icon type="button" title="下移" onclick={() => moveDown(index)} disabled={index === draftValues.length - 1}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg>
                         </Button>
                     {/if}
-                    <Button icon danger type="button" title="Remove" onclick={() => removeRow(index)}>
+                    <Button icon danger type="button" title="移除" onclick={() => removeRow(index)}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
                     </Button>
                 </div>
@@ -138,10 +138,10 @@
 
     {#snippet footer()}
         <div class="footer-left">
-            <Button onclick={addRow}>Add Row</Button>
+            <Button onclick={addRow}>添加一行</Button>
         </div>
-        <Button onclick={onclose}>Close</Button>
-        <Button primary onclick={() => onsave?.(draftValues)} disabled={!canSave}>Save</Button>
+        <Button onclick={onclose}>关闭</Button>
+        <Button primary onclick={() => onsave?.(draftValues)} disabled={!canSave}>保存</Button>
     {/snippet}
 </DialogModal>
 

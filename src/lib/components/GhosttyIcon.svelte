@@ -31,7 +31,7 @@
     const {width = "100px", height = "100px"}: Props = $props();
 </script>
 
-<div class="icon-shell" aria-label="Ghostty icon preview" style:width style:height style:--screen={`url(${customLayerUrls.mask})`} style:--ghost={`url(${customLayerUrls.ghost})`}>
+<div class="icon-shell" aria-label="Ghostty 图标预览" style:width style:height style:--screen={`url(${customLayerUrls.mask})`} style:--ghost={`url(${customLayerUrls.ghost})`}>
     {#if isCustomStyle && !hasCdnError}
         <!-- eslint-disable-next-line svelte/no-unused-class-name -->
         <img class="layer frame" src={frameUrl} alt="" onerror={handleAssetError} />
@@ -47,9 +47,9 @@
     {:else}
         <img class="icon-image" src={hasCdnError ? iconUrls.official : iconUrl} alt={`Ghostty ${iconLabel} icon`} onerror={handlePrimaryIconError} />
         {#if isCustomFile}
-            <div class="custom-badge">Custom file</div>
+            <div class="custom-badge">自定义文件</div>
         {:else if hasCdnError}
-            <div class="custom-badge">CDN fallback</div>
+            <div class="custom-badge">CDN 回退</div>
         {/if}
     {/if}
 </div>

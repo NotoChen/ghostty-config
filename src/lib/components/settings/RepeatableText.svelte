@@ -11,7 +11,7 @@
 
     let {
         value = $bindable([]),
-        placeholder = "Add a value…", // eslint-disable-line prefer-const
+        placeholder = "添加一个值…", // eslint-disable-line prefer-const
         canReorder = true, // eslint-disable-line prefer-const
     }: Props = $props();
 
@@ -61,7 +61,7 @@
 {#if isEditorOpen}
     <RepeatableInputModal
         bind:draftValues
-        title={settingInfo?.name ?? "Repeatable Value Editor"}
+        title={settingInfo?.name ?? "可重复值编辑器"}
         onsave={onEditorSave}
         {placeholder}
         {canReorder}

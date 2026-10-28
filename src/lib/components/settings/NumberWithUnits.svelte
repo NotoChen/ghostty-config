@@ -51,7 +51,7 @@
         step={1}
         integer
         nullable
-        placeholder="unset"
+        placeholder="未设置"
         onchange={onNumberChange}
     />
     <PillButtonGroup

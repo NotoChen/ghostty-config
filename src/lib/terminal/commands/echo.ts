@@ -4,7 +4,7 @@ import {ok, s} from "../utils";
 
 
 const command: Command = {
-    desc: "Print text",
+    desc: "输出文本",
     usage: "[text...]",
     fn(args, ctx) {
         const cleanArgs = args.map(arg => arg.replace(/^["']|["']$/g, ""));

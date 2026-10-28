@@ -242,14 +242,14 @@ export interface DurationParseResult {
 }
 
 export const DURATION_UNITS: DurationUnit[] = [
-    {suffix: "ns", label: "Nanosecond", plural: "Nanoseconds", ms: 0.000001},
-    {suffix: "us", label: "Microsecond", plural: "Microseconds", ms: 0.001},
-    {suffix: "ms", label: "Millisecond", plural: "Milliseconds", ms: 1},
-    {suffix: "s", label: "Second", plural: "Seconds", ms: 1000},
-    {suffix: "m", label: "Minute", plural: "Minutes", ms: 60_000},
-    {suffix: "h", label: "Hour", plural: "Hours", ms: 3_600_000},
-    {suffix: "d", label: "Day", plural: "Days", ms: 86_400_000},
-    {suffix: "y", label: "Year", plural: "Years", ms: 31_536_000_000},
+    {suffix: "ns", label: "纳秒", plural: "纳秒", ms: 0.000001},
+    {suffix: "us", label: "微秒", plural: "微秒", ms: 0.001},
+    {suffix: "ms", label: "毫秒", plural: "毫秒", ms: 1},
+    {suffix: "s", label: "秒", plural: "秒", ms: 1000},
+    {suffix: "m", label: "分钟", plural: "分钟", ms: 60_000},
+    {suffix: "h", label: "小时", plural: "小时", ms: 3_600_000},
+    {suffix: "d", label: "天", plural: "天", ms: 86_400_000},
+    {suffix: "y", label: "年", plural: "年", ms: 31_536_000_000},
 ];
 
 // Longest suffix first so 'ms' matches before 's', 'us' before 's', etc.
@@ -261,7 +261,7 @@ export function parseDuration(raw: string, nullable = false): DurationParseResul
     if (trimmed === "") {
         return nullable
             ? {ok: true, segments: []}
-            : {ok: false, segments: [], error: "Value is required"};
+            : {ok: false, segments: [], error: "此项必填"};
     }
 
     const segments: DurationSegment[] = [];
@@ -299,7 +299,7 @@ export function parseDuration(raw: string, nullable = false): DurationParseResul
     }
 
     if (segments.length === 0) {
-        return {ok: false, segments, error: "Enter a duration"};
+        return {ok: false, segments, error: "请输入时长"};
     }
 
     return {ok: true, segments};

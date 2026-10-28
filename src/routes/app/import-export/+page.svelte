@@ -4,6 +4,7 @@
     import Separator from "$lib/components/settings/Separator.svelte";
     import {diff} from "$lib/stores/config.svelte";
     // import {alert as showAlert} from "$lib/stores/modals.svelte";
+    import {annotatedConfigText} from "$lib/utils/configComments";
     import {serialize} from "$lib/utils/parse";
     import {buildShareUrl, encodeConfig, MAX_SHARE_URL_LENGTH} from "$lib/utils/share";
     import Page from "$lib/views/Page.svelte";
@@ -37,7 +38,7 @@
             checkTextForImport("clipboard", text);
         }
         catch {
-            error("Clipboard access failed! Please paste manually or import from file.");
+            error("读取剪贴板失败，请手动粘贴或改用文件导入。");
         }
     }
 
@@ -59,18 +60,18 @@
         if (!hasExportableConfig) return;
 
         try {
-            await window.navigator.clipboard.writeText(serialize(currentConfigDiff));
-            success("Config copied to clipboard");
+            await window.navigator.clipboard.writeText(annotatedConfigText(currentConfigDiff));
+            success("已复制到剪贴板");
         }
         catch {
-            error("Clipboard access failed! Please copy manually or export to file.");
+            error("写入剪贴板失败，请手动复制或改用下载文件。");
         }
     });
 
     const downloadConfig = debounce(function() {
         if (!hasExportableConfig) return;
 
-        const blob = new Blob([serialize(currentConfigDiff)], {type: "text/plain"});
+        const blob = new Blob([annotatedConfigText(currentConfigDiff)], {type: "text/plain"});
         const url = URL.createObjectURL(blob);
 
         const link = document.createElement("a");
@@ -79,7 +80,7 @@
         link.click();
 
         URL.revokeObjectURL(url);
-        success("Config file downloaded");
+        success("配置文件已下载");
     }, 300);
 
 
@@ -117,52 +118,52 @@
 
 <svelte:window onkeydown={handleWindowKeydown} />
 
-<Page title="Import & Export">
+<Page title="导入与导出">
     <ConfigPreview parsed={currentConfigDiff} parsedDiff={currentConfigDiff} />
 
-    <Group title="Import">
-        <Item name="From Clipboard" note="Paste a config copied to your clipboard">
+    <Group title="导入">
+        <Item name="从剪贴板" note="粘贴你复制到剪贴板的配置">
             <div class="button-group">
-                <Button onclick={pasteConfig} title="Paste">Import</Button>
+                <Button onclick={pasteConfig} title="粘贴">导入</Button>
             </div>
         </Item>
         <Separator />
-        <Item name="From File" note="Upload a config file from your device">
+        <Item name="从文件" note="从本机上传配置文件">
             <div class="button-group">
                 <input id="config-input" type="file" onchange={selectFile} bind:this={filePicker} />
-                <Button onclick={() => filePicker?.click()} title="Upload">Choose File...</Button>
+                <Button onclick={() => filePicker?.click()} title="上传">选择文件…</Button>
             </div>
         </Item>
     </Group>
-    <Group title="Export">
-        <Item name="Copy to Clipboard" note="Copy your config to the clipboard to paste elsewhere">
+    <Group title="导出">
+        <Item name="复制到剪贴板" note="把配置复制到剪贴板，便于粘贴到别处">
             <div class="button-group">
                 <Button
                     onclick={copyConfig}
-                    title={hasExportableConfig ? "Copy" : "No changes yet!"}
+                    title={hasExportableConfig ? "复制" : "尚无改动"}
                     disabled={!hasExportableConfig}
-                >Copy</Button>
+                >复制</Button>
             </div>
         </Item>
         <Separator />
-        <Item name="Download File" note="Save as a config file you can place in Ghostty's config directory">
+        <Item name="下载文件" note="保存为配置文件，可放入 Ghostty 的配置目录">
             <div class="button-group">
                 <Button
                     onclick={downloadConfig}
-                    title={hasExportableConfig ? "Download" : "No changes yet!"}
+                    title={hasExportableConfig ? "下载" : "尚无改动"}
                     disabled={!hasExportableConfig}
-                >Download</Button>
+                >下载</Button>
             </div>
         </Item>
         <Separator />
-        <Item name="Share Link" note="Generate a link others can use to import your config">
+        <Item name="分享链接" note="生成一个链接，别人可通过它导入你的配置">
             <div class="button-group">
                 <Button
                     primary
                     onclick={openShareComposer}
-                    title={hasExportableConfig ? "Share your config" : "No changes yet!"}
+                    title={hasExportableConfig ? "分享你的配置" : "尚无改动"}
                     disabled={!hasExportableConfig}
-                >Share</Button>
+                >分享</Button>
             </div>
         </Item>
     </Group>

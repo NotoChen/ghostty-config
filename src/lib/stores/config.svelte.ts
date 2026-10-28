@@ -74,6 +74,21 @@ export function load(conf: Partial<typeof config>) {
     }
 }
 
+/**
+ * Replace the store's values with `conf` wholesale, instead of merging into what's already
+ * there. `load()` appends repeatables (right for "import another config on top"), but editing
+ * *the* config from disk must not end up with every keybind twice.
+ */
+export function loadReplacing(conf: Partial<SettingValues>) {
+    for (const key in conf) {
+        if (!(key in config)) continue;
+        const settingId = key as keyof SettingValues;
+        const value = conf[settingId];
+        if (value === undefined) continue;
+        setSetting(settingId, value);
+    }
+}
+
 // NOTE: theme colors are never written into this store. Selecting a theme only sets the
 // `theme` string; the displayed colors are derived in stores/theme.svelte.ts (effectiveColors),
 // which is why diff() needs no theme-exclusion logic to keep exports clean.
@@ -89,6 +104,11 @@ export function setSetting<K extends keyof SettingValues>(key: K, value: Setting
 export function resetSetting(key: keyof SettingValues) {
     const defaultValue = defaults[key];
     setSetting(key, Array.isArray(defaultValue) ? [...defaultValue] : defaultValue);
+}
+
+/** Put every setting back to its default — the starting point before loading an external config. */
+export function resetAll() {
+    for (const key of Object.keys(defaults) as Array<keyof SettingValues>) resetSetting(key);
 }
 
 export function isNonDefault(key: keyof SettingValues): boolean {

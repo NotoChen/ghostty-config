@@ -27,10 +27,10 @@
             value={theme}
             {options}
             change={setTheme}
-            placeholder="Theme…"
+            placeholder="主题…"
             searchable
             allowEmpty
-            emptyLabel="Reset Theme"
+            emptyLabel="重置主题"
             iconSize={32}
             maxWidth={150}
         />

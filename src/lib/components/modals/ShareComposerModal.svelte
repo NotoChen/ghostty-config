@@ -27,7 +27,7 @@
     let canUseNativeShare = $state(false);
 
     const displayNotice = $derived(
-        notice ?? (isTooLong ? null : "This link contains your config data. Share only with people you trust.")
+        notice ?? (isTooLong ? null : "此链接包含你的配置数据，请只分享给你信任的人。")
     );
 
     // Button handlers
@@ -47,15 +47,15 @@
         if (isTooLong) {
             void copyToClipboard(
                 configText,
-                "Config copied. You can share it as plain text instead of a link.",
-                "Clipboard access failed. Use file export instead."
+                "配置已复制。你也可以直接用纯文本分享，而不走链接。",
+                "无法访问剪贴板，请改用导出文件。"
             );
         }
         else if (shareUrl) {
             void copyToClipboard(
                 shareUrl,
-                "Share link copied to clipboard.",
-                "Select the link and copy manually."
+                "分享链接已复制到剪贴板。",
+                "请手动选中链接并复制。"
             );
         }
     }, 300);
@@ -72,15 +72,15 @@
 </script>
 
 
-<DialogModal title="Share Config" {onclose}>
+<DialogModal title="分享配置" {onclose}>
     {#snippet icon()}
         <ShareIcon />
     {/snippet}
 
     {#if isTooLong}
-        <p class="share-modal-desc">This config is too large for reliable URL sharing across apps and browsers.</p>
+        <p class="share-modal-desc">配置过大，无法在各应用和浏览器之间可靠地通过 URL 分享。</p>
     {:else}
-        <p class="share-modal-desc">Review and copy the share link below.</p>
+        <p class="share-modal-desc">请在下方查看并复制分享链接。</p>
         <input
             type="text"
             class="share-link-input"
@@ -94,15 +94,15 @@
     {/if}
 
     {#snippet footer()}
-        <Button onclick={onclose}>Close</Button>
+        <Button onclick={onclose}>关闭</Button>
 
         {#if isTooLong}
-            <Button onclick={ondownload}>Download File</Button>
+            <Button onclick={ondownload}>下载文件</Button>
         {:else if canUseNativeShare}
-            <Button onclick={nativeShareLink}>Share...</Button>
+            <Button onclick={nativeShareLink}>分享…</Button>
         {/if}
 
-        <Button primary onclick={onClickCopy}>{isTooLong ? "Copy Config Text" : "Copy Link"}</Button>
+        <Button primary onclick={onClickCopy}>{isTooLong ? "复制配置文本" : "复制链接"}</Button>
     {/snippet}
 </DialogModal>
 

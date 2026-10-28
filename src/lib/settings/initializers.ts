@@ -1,3 +1,4 @@
+import {getOS} from "$lib/utils/platform";
 import {registry} from "./registry";
 
 type Registry = typeof registry;
@@ -23,23 +24,11 @@ export async function runAsyncInitializers() {
 }
 
 
-// TODO: this belongs elsewhere surely
-const getOS = () => {
-    if (typeof navigator === "undefined") return "other";
-    const platform = navigator.userAgent?.toLowerCase();
-    if (platform.includes("linux")) return "linux";
-    if (platform.includes("mac")) return "macos";
-    return "other";
-};
-
 type Initializer = (registry: Registry) => void;
 
 const syncInitializers: Initializer[] = [
-    (_: Registry) => {
-        // Leaving this here as an example for the future
-        // Apparently Ghostty now sets this to "true" for both mac and linux
-        // reg.copyOnSelect.default = getOS() === "linux" ? "true" : "false";
-    },
+    // `copy-on-select` defaults to `primary` on Linux and `none` elsewhere (Ghostty 1.4).
+    (reg: Registry) => reg.copyOnSelect.default = getOS() === "linux" ? "primary" : "none",
 
     (reg: Registry) => reg.quitAfterLastWindowClosed.default = String(getOS() !== "macos"),
 ];

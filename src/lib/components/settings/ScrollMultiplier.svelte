@@ -14,4 +14,4 @@
 </script>
 
 
-<DualNumber bind:value={() => dualValue, onChange} labels={["Precision", "Discrete"]} min={0.01} max={10000} step={0.1} />
+<DualNumber bind:value={() => dualValue, onChange} labels={["精确", "离散"]} min={0.01} max={10000} step={0.1} />

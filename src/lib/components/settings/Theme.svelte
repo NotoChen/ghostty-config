@@ -23,7 +23,7 @@
     <DualTheme bind:value {options} />
     {#if isDual}
         <div class="preview-toggle">
-            <span class="preview-label">Previewing</span>
+            <span class="preview-label">预览中</span>
             <PillButtons
                 bind:value={() => preview.mode as string, (v: string) => preview.mode = v as PreviewMode}
                 options={[{value: "light", label: "Light"}, {value: "dark", label: "Dark"}]}

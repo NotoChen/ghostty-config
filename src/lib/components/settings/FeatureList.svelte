@@ -50,14 +50,14 @@
 </script>
 
 <Button onclick={openEditor}>
-    Configure…
+    配置…
 </Button>
 
 <svelte:document onkeydown={handleEditorKeydown} />
 
 
 {#if isEditorOpen}
-    <DialogModal title={settingInfo?.name ?? "Configure Features"} onclose={closeEditor}>
+    <DialogModal title={settingInfo?.name ?? "配置特性"} onclose={closeEditor}>
         {#snippet icon()}
             <CheckListIcon />
         {/snippet}
@@ -72,8 +72,8 @@
         </Group>
 
         {#snippet footer()}
-            <Button onclick={closeEditor}>Close</Button>
-            <Button primary onclick={onEditorSave}>Save</Button>
+            <Button onclick={closeEditor}>关闭</Button>
+            <Button primary onclick={onEditorSave}>保存</Button>
         {/snippet}
     </DialogModal>
 {/if}

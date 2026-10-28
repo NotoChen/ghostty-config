@@ -16,7 +16,7 @@
     const {
         title,
         iconSrc,
-        iconAlt = "Warning",
+        iconAlt = "警告",
         onclose,
         actions,
         children

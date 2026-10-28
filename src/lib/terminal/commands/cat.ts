@@ -4,7 +4,7 @@ import {err, ok, s} from "../utils";
 
 
 const command: Command = {
-    desc: "Print file contents",
+    desc: "显示文件内容",
     usage: "<file>",
     fn(args, ctx) {
         if (!args[0]) return err("cat: missing operand");

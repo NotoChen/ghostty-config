@@ -20,11 +20,11 @@ export const macosIconOptions: DropdownOption[] = [
     ...Object.keys(iconUrls).map(key => ({
         value: key,
         name: key[0].toUpperCase() + key.slice(1),
-        group: "Predefined icons",
+        group: "预置图标",
         icon: iconUrls[key as keyof typeof iconUrls]
     })),
-    {value: "custom", name: "Custom Icon", description: "Use your own icon file.", group: "Custom"},
-    {value: "custom-style", name: "Custom Style", description: "Customize the icon with colors and frames.", group: "Custom"}
+    {value: "custom", name: "自定义图标", description: "使用你自己的图标文件。", group: "自定义"},
+    {value: "custom-style", name: "自定义样式", description: "用颜色和边框定制图标。", group: "自定义"}
 ];
 
 export const macosIconFrameOptions: DropdownOption[] = Object.keys(frameUrls).map(key => ({

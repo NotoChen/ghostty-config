@@ -4,7 +4,7 @@ import {err, ok, s} from "../utils";
 
 
 const command: Command = {
-    desc: "Create a directory",
+    desc: "创建目录",
     usage: "<dir>",
     fn(args, ctx) {
         if (!args[0]) return err("mkdir: missing operand");

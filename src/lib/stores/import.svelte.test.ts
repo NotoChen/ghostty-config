@@ -41,11 +41,11 @@ afterEach(() => {
 
 describe("getSourceInfo", () => {
     it("returns per-source copy for each import source", () => {
-        expect(getSourceInfo("share").title).toBe("Shared Config");
-        expect(getSourceInfo("share").successMessage).toBe("Shared config imported");
-        expect(getSourceInfo("clipboard").title).toBe("Import Config");
-        expect(getSourceInfo("clipboard").successMessage).toBe("Config imported");
-        expect(getSourceInfo("file").title).toBe("Import Config");
+        expect(getSourceInfo("share").title).toBe("共享配置");
+        expect(getSourceInfo("share").successMessage).toBe("共享配置已导入");
+        expect(getSourceInfo("clipboard").title).toBe("导入配置");
+        expect(getSourceInfo("clipboard").successMessage).toBe("配置已导入");
+        expect(getSourceInfo("file").title).toBe("导入配置");
     });
 });
 

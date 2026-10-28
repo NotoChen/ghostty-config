@@ -50,12 +50,12 @@
     });
 
     const pillOptions = $derived<PillOption[]>([
-        {label: "Custom", value: "custom", variant: "neutral"},
+        {label: "自定义", value: "custom", variant: "neutral"},
         ...presets.map(s => ({label: s.label, value: s.value, variant: "accent" as const})),
     ]);
 
     const dropdownOptions = $derived([
-        {name: "Custom", value: "custom"},
+        {name: "自定义", value: "custom"},
         ...presets.map(s => ({name: s.label, value: s.value, description: s.description})),
     ]);
 

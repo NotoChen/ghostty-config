@@ -1,4 +1,5 @@
 <script lang="ts">
+    import {base} from "$app/paths";
     import {page} from "$app/state";
     import type {Snippet} from "svelte";
 
@@ -17,13 +18,22 @@
     const target = $derived(isExternal ? "_blank" : "");
     const rel = $derived(isExternal ? "noopener noreferrer" : "");
 
-    const isSelected = $derived(selected ?? (path === route));
+    // Routes arrive both bare ("/settings/fonts") and already base-prefixed (search results, which
+    // go through `resolve`). Prefix only the bare ones, so a project-page deploy under
+    // /<repo> links correctly and one that already carries the base isn't doubled.
+    const href = $derived.by(() => {
+        if (isExternal || !route.startsWith("/")) return route;
+        if (!base || route === base || route.startsWith(`${base}/`)) return route;
+        return `${base}${route}`;
+    });
+
+    const isSelected = $derived(selected ?? (path === href));
 </script>
 
 
 <!-- Why is eslint like this? -->
 <!-- eslint-disable-next-line svelte/no-navigation-without-resolve, svelte/first-attribute-linebreak -->
-<a href={route}
+<a {href}
     class="nav-tab"
     class:selected={isSelected}
     {target}

@@ -1,8 +1,8 @@
 <script lang="ts">
+    import {marked} from "marked";
     import {type Snippet} from "svelte";
     import {createTooltipAttachment} from "$lib/attachments/tooltip";
     import type {GhosttyPlatform} from "$lib/settings/types";
-    import {alert} from "$lib/stores/modals.svelte";
     import Badge from "../Badge.svelte";
     import {searchState} from "$lib/stores/search.svelte";
     import {setSetting} from "$lib/contexts";
@@ -24,7 +24,7 @@
     }
 
     const {name = "", note = "", platform, since, description, settingId, children, onReset, isNonDefault = false, inline = true, themeBadge}: Props = $props();
-    const tooltipAttachment = createTooltipAttachment("Reset to default");
+    const tooltipAttachment = createTooltipAttachment("恢复默认值");
 
 
      const platformLabelMap: Record<GhosttyPlatform, string> = {
@@ -50,16 +50,21 @@
         const platformBadge = getPlatformBadgeLabel(platformLabels);
         if (platformBadge) badges.push({label: platformBadge, type: "platform"});
         if (since) badges.push({label: since, type: "version"});
-        if (themeBadge) badges.push({label: "From theme", type: "theme"});
+        if (themeBadge) badges.push({label: "来自主题", type: "theme"});
         return badges;
     });
 
     const getBadgeTooltip = (badge: {label: string, type: "platform" | "version" | "theme"}) => {
-        if (badge.type === "platform") return platformLabels.length > 1 ? `Available on: ${platformLabels.join(", ")}` : `Platform: ${platformLabels[0]}`;
-        if (badge.type === "version") return `Added in Ghostty v${since}`;
+        if (badge.type === "platform") return platformLabels.length > 1 ? `可用平台：${platformLabels.join("、")}` : `平台：${platformLabels[0]}`;
+        if (badge.type === "version") return `Ghostty v${since} 起支持`;
         if (badge.type === "theme") return themeBadge ?? "";
         return "";
     };
+
+    // The schema description belongs next to the control, in full: it explains the value being
+    // edited, so reading it must not cost a click. Muted, small type keeps a page of them
+    // scannable, and the markdown renders in place (lists, `code`, links).
+    const descriptionHtml = $derived(description ? marked.parse(description) : note);
 
     let itemElement: HTMLElement | null = null;
     let shouldHighlight = $state(false);
@@ -111,7 +116,7 @@
                         <button
                             class="reset-button"
                             onclick={onReset}
-                            title="Reset to default"
+                            title="恢复默认值"
                             type="button"
                             {@attach tooltipAttachment}
                         >
@@ -126,25 +131,17 @@
             {/if}
         </div>
         {/if}
-        {#if description}
+        {#if inline}
             <div class="row-right">
-                {#if inline}<div class="setting">{@render children()}</div>{/if}
-                <button type="button" class="setting-info" aria-label="Full description" onclick={() => alert({title: name, message: description})}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 56 56">
-                        <path d="M0 0h56v56H0z" fill="none" />
-                        <path fill="currentColor" d="M28 51.906c13.055 0 23.906-10.828 23.906-23.906c0-13.055-10.875-23.906-23.93-23.906C14.899 4.094 4.095 14.945 4.095 28c0 13.078 10.828 23.906 23.906 23.906m0-3.984C16.937 47.922 8.1 39.062 8.1 28c0-11.04 8.813-19.922 19.876-19.922c11.039 0 19.921 8.883 19.945 19.922c.023 11.063-8.883 19.922-19.922 19.922m-.211-28.266c1.71 0 3.047-1.36 3.047-3.047c0-1.71-1.336-3.07-3.047-3.07s-3.047 1.36-3.047 3.07a3.026 3.026 0 0 0 3.047 3.047m-3.914 21.235h9.562c.961 0 1.711-.68 1.711-1.641c0-.914-.75-1.64-1.71-1.64H30.53V25.68c0-1.266-.656-2.11-1.828-2.11h-4.43c-.937 0-1.687.727-1.687 1.64c0 .962.75 1.642 1.687 1.642h2.532v10.757h-2.93c-.938 0-1.688.727-1.688 1.641c0 .96.75 1.64 1.688 1.64" />
-                    </svg>
-                </button>
+                <div class="setting">{@render children()}</div>
             </div>
-        {:else}
-            {#if inline}<div class="setting">{@render children()}</div>{/if}
         {/if}
     </div>
-    {#if note}
-    <div class="note">
-        <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-        {@html note} <!-- TODO: sanitize this? It's written and maintained by us -->
-    </div>
+    {#if descriptionHtml}
+        <div class="desc">
+            <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+            {@html descriptionHtml}
+        </div>
     {/if}
     {#if !inline}<div class="setting">{@render children()}</div>{/if}
 </div>
@@ -209,31 +206,6 @@
     gap: 5px;
 }
 
-.setting-info {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 16px;
-    height: 16px;
-    border: 0;
-    padding: 0;
-    background: none;
-    color: var(--font-color-muted);
-    cursor: pointer;
-}
-
-.setting-info svg {
-    width: 16px;
-    height: 16px;
-}
-
-.setting-info:focus-visible,
-.setting-info:hover {
-    border-color: var(--color-input-accent);
-    color: var(--font-color);
-    outline: none;
-}
-
 .reset-button {
     background: none;
     border: 0;
@@ -284,26 +256,49 @@
     flex: none;
 }
 
-/* When the setting is not inline, we want the description/info button to be on the same row as the name, and the setting content to be below. */
+/* When the setting is not inline, the description sits under the name and the setting content goes below it. */
 .setting-item > .setting {
     margin-top: 4px;
     justify-content: flex-start;
 }
 
-.note {
+/* The setting's explanation, next to its control: the full schema markdown, always on screen
+   instead of behind an info icon or an expand toggle. */
+.desc {
     color: var(--font-color-muted);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    min-width: 0;
 }
 
-.note :global(code) {
-    padding: 2px 4px;
+.desc :global(p) {
+    margin: 0 0 6px;
+}
+
+.desc :global(p:last-child) {
+    margin-bottom: 0;
+}
+
+.desc :global(ul),
+.desc :global(ol) {
+    margin: 4px 0 6px;
+    padding-left: 1.1rem;
+}
+
+.desc :global(li + li) {
+    margin-top: 3px;
+}
+
+.desc :global(a) {
+    color: var(--color-input-accent);
+}
+
+.desc :global(code) {
+    padding: 1px 4px;
     border-radius: var(--radius-level-4);
     background: rgba(from var(--bg-level-2) r g b / 0.6);
-    backdrop-filter: blur(20px);
     border: 1px solid var(--border-level-1);
-    box-shadow:
-        0 0 1px -1px rgba(0,0,0,0.7),
-        0 0 1px white inset;
+    font-size: 0.95em;
 }
 
 @keyframes flash-highlight {

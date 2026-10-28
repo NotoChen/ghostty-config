@@ -3,7 +3,7 @@ import {clear} from "../utils";
 
 
 const command: Command = {
-    desc: "Clear the terminal screen",
+    desc: "清空终端屏幕",
     fn: () => clear(),
 };
 

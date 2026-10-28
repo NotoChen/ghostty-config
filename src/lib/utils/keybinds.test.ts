@@ -1,11 +1,23 @@
 import {describe, expect, it} from "vitest";
 import {
     canonicalTrigger,
+    describeAction,
     formatTrigger,
     getDiagnostics,
     parseKeybind,
-    parseTrigger
+    parseTrigger,
+    splitKeybind
 } from "./keybinds";
+
+describe("splitKeybind", () => {
+    it("keeps an '=' key on the trigger side", () => {
+        expect(splitKeybind("super+==increase_font_size:1")).toEqual(["super+=", "increase_font_size:1"]);
+    });
+
+    it("splits a plain binding", () => {
+        expect(splitKeybind("super+t=new_tab")).toEqual(["super+t", "new_tab"]);
+    });
+});
 
 describe("parseKeybind", () => {
     it("parses '+' key with modifiers", () => {
@@ -27,7 +39,24 @@ describe("parseKeybind", () => {
     it("keeps incomplete triggers invalid", () => {
         const parsed = parseKeybind("ctrl+=ignore");
 
-        expect(parsed.error).toContain("invalid trigger format");
+        expect(parsed.error).toContain("触发键格式无效");
+    });
+
+    it("keeps an '=' key in the trigger", () => {
+        const parsed = parseKeybind("super+==increase_font_size:1");
+
+        expect(parsed.error).toEqual([]);
+        expect(parsed.trigger?.steps).toEqual([{key: "=", modifiers: ["super"]}]);
+        expect(parsed.action).toBe("increase_font_size");
+        expect(parsed.args).toBe("1");
+    });
+
+    it("keeps a '+' key in the trigger", () => {
+        const parsed = parseKeybind("super++=increase_font_size:1");
+
+        expect(parsed.error).toEqual([]);
+        expect(parsed.trigger?.steps).toEqual([{key: "+", modifiers: ["super"]}]);
+        expect(parsed.action).toBe("increase_font_size");
     });
 
     it("supports ghostty-style physical keys", () => {
@@ -61,7 +90,7 @@ describe("parseKeybind", () => {
     it("validates enum action arguments", () => {
         const parsed = parseKeybind("ctrl+a=copy_to_clipboard:invalid");
 
-        expect(parsed.error).toContain("Invalid value for 'copy_to_clipboard': 'invalid'");
+        expect(parsed.error).toContain("'copy_to_clipboard' 的值无效：'invalid'");
     });
 
     it("validates number action arguments", () => {
@@ -115,25 +144,25 @@ describe("parseKeybind", () => {
     it("rejects global/all sequences", () => {
         const parsed = parseKeybind("global:ctrl+a>ctrl+b=ignore");
 
-        expect(parsed.error).toContain("global/all keybinds cannot be sequences");
+        expect(parsed.error).toContain("global/all 快捷键不能是按键序列");
     });
 
     it("rejects invalid modifiers", () => {
         const parsed = parseKeybind("meh+a=ignore");
 
-        expect(parsed.error).toContain("invalid modifier 'meh'");
+        expect(parsed.error).toContain("无效修饰键 'meh'");
     });
 
     it("rejects too many modifiers", () => {
         const parsed = parseKeybind("ctrl+alt+super+shift+meh+a=ignore");
 
-        expect(parsed.error).toContain("too many modifiers");
+        expect(parsed.error).toContain("修饰键过多");
     });
 
     it("rejects malformed keybinds missing '='", () => {
         const parsed = parseKeybind("ctrl+a");
 
-        expect(parsed.error).toContain("missing '=' between trigger and action");
+        expect(parsed.error).toContain("触发键与操作之间缺少 '='");
     });
 
     it("supports W3C key codes and normalizes them", () => {
@@ -203,7 +232,7 @@ describe("canonicalTrigger and formatTrigger", () => {
         const source = "global:performable:super+physical:five>ctrl+shift+arrow_down=goto_tab:5";
         const parsed = parseKeybind(source);
 
-        expect(parsed.error).toContain("global/all keybinds cannot be sequences");
+        expect(parsed.error).toContain("global/all 快捷键不能是按键序列");
         expect(parsed.trigger).toBeTruthy();
 
         const formatted = formatTrigger(parsed.trigger!);
@@ -244,6 +273,20 @@ describe("canonicalTrigger and formatTrigger", () => {
     });
 });
 
+describe("describeAction", () => {
+    it("explains a plain action in Chinese", () => {
+        expect(describeAction("super+t=new_tab")).toBe("新建标签页。");
+    });
+
+    it("ignores the action's argument", () => {
+        expect(describeAction("super+==increase_font_size:1")).toBe("按指定点数增大字号。");
+    });
+
+    it("is blank for actions the editor doesn't know", () => {
+        expect(describeAction("ctrl+a=does_not_exist")).toBe("");
+    });
+});
+
 describe("getDiagnostics", () => {
     it("marks duplicates based on canonical trigger", () => {
         const diagnostics = getDiagnostics([
@@ -263,7 +306,7 @@ describe("getDiagnostics", () => {
 
         expect(diagnostics[0]?.status).toBe("invalid");
         expect(diagnostics[0]?.canonical).toBe("");
-        expect(diagnostics[0]?.errors).toContain("invalid trigger format");
+        expect(diagnostics[0]?.errors).toContain("触发键格式无效");
     });
 
     it("treats W3C and ghostty key names as duplicate bindings", () => {

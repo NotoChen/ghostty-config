@@ -1,11 +1,15 @@
 {
     "name": "ghostty-config",
-    "version": "0.3.0",
-    "description": "A beautiful config generator for Ghostty terminal.",
-    "author": "Zerebos",
+    "version": "1.4.0",
+    "description": "A beautiful config generator for Ghostty terminal, with a full Chinese UI.",
+    "author": "NotoChen",
+    "contributors": [
+        "Zerebos (original author of Ghostty Config)"
+    ],
+    "homepage": "https://notochen.github.io/ghostty-config/",
     "repository": {
         "type": "git",
-        "url": "https://github.com/zerebos/ghostty-config"
+        "url": "https://github.com/NotoChen/ghostty-config"
     },
     "license": "Apache-2.0",
     "scripts": {

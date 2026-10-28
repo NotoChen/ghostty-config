@@ -281,19 +281,19 @@
         style:height={`${height}px`}
         style:cursor={dragging ? "grabbing" : "default"}
         role="dialog"
-        aria-label="Interactive terminal preview"
+        aria-label="交互式终端预览"
         aria-hidden={!app.floatingTerminalVisible && !animating}
         aria-modal="false"
     >
         <div class="titlebar" role="presentation" onmousedown={startDrag}>
             <div class="traffic-lights">
-                <button type="button" class="dot dot-red" onclick={close} aria-label="Close preview window" title="Close">
+                <button type="button" class="dot dot-red" onclick={close} aria-label="关闭预览窗口" title="关闭">
                     <span class="dot-symbol">&times;</span>
                 </button>
-                <button type="button" class="dot dot-yellow" onclick={minimize} aria-label="Minimize" title="Minimize">
+                <button type="button" class="dot dot-yellow" onclick={minimize} aria-label="最小化" title="最小化">
                     <span class="dot-symbol">&ndash;</span>
                 </button>
-                <button type="button" class="dot dot-green" aria-label="Zoom" title="Zoom">
+                <button type="button" class="dot dot-green" aria-label="缩放" title="缩放">
                     <span class="dot-symbol">&plus;</span>
                 </button>
             </div>

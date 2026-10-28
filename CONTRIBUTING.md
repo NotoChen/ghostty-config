@@ -5,7 +5,7 @@ Thanks for your interest! A few things to set expectations: this is a solo-maint
 ## Setup
 
 ```bash
-git clone https://github.com/zerebos/ghostty-config.git
+git clone https://github.com/NotoChen/ghostty-config.git
 cd ghostty-config
 bun install
 bun run dev

@@ -3,14 +3,14 @@ import {err, ok, s} from "../utils";
 
 
 const command: Command = {
-    desc: "Show available commands or detailed help for a command",
+    desc: "列出可用命令，或查看某个命令的详细帮助",
     usage: "[command]",
-    details: ["With no arguments, lists all commands.", "With a command name, shows detailed help for that command."],
+    details: ["不带参数时列出所有命令。", "带命令名时显示该命令的详细帮助。"],
     fn(args, ctx) {
         const commands = ctx.commands;
         if (args[0]) {
             const cmd = commands[args[0]];
-            if (!cmd) return err(`help: no such command: ${args[0]}`);
+            if (!cmd) return err(`help: 没有该命令：${args[0]}`);
             const lines: Line[] = [
                 [s.bold(args[0]), cmd.usage ? s.plain(" " + cmd.usage) : s.plain(""), s.plain("  —  " + cmd.desc)],
             ];
@@ -23,7 +23,7 @@ const command: Command = {
 
         const longest = Math.max(...Object.keys(commands).map(k => k.length + (commands[k].usage?.length ?? 0) + 1));
         const lines: Line[] = [
-            [s.bold("Available commands:"), s.dim("  (help <cmd> for details)")],
+            [s.bold("可用命令："), s.dim("  （help <命令> 查看详情）")],
             [s.plain("")],
         ];
 

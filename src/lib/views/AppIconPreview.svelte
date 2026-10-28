@@ -14,7 +14,7 @@
     <div class="label">{iconLabel}</div>
     {#if isCustomStyle && !hasCustomColors}
         <div class="note">
-            Set the icon frame and both colors for a fully custom preview.
+            设置图标边框和两种颜色即可完整预览自定义效果。
         </div>
     {/if}
 </div>

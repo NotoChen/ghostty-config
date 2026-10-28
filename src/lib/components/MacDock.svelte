@@ -31,7 +31,7 @@
 
 <div class="dock-layer">
     <FloatingTerminal />
-    <div class="dock" role="toolbar" aria-label="macOS-style dock" style:--tile-size={`${tileSize}px`} style:--dock-height={`${dockHeight}px`}>
+    <div class="dock" role="toolbar" aria-label="macOS 风格程序坞" style:--tile-size={`${tileSize}px`} style:--dock-height={`${dockHeight}px`}>
         <!-- Ghostty Config icon — always running -->
         <div class="dock-item dock-btn" title="Ghostty Config">
             <div class="dock-icon-wrap">
@@ -47,9 +47,9 @@
             type="button"
             class="dock-item dock-btn"
             id="ghostty-terminal-dock-button"
-            title="Live Preview Terminal"
+            title="实时预览终端"
             onclick={activateTerminal}
-            aria-label="Open live preview terminal"
+            aria-label="打开实时预览终端"
             aria-pressed={app.floatingTerminalVisible}
         >
             <div class="dock-icon-wrap">

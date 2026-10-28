@@ -3,7 +3,7 @@ import {ok, s} from "../utils";
 
 
 const command: Command = {
-    desc: "Print current date and time",
+    desc: "显示当前日期和时间",
     fn() {return ok([[s.plain(new Date().toString())]]);},
 };
 

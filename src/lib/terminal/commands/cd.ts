@@ -4,9 +4,9 @@ import {err, ok} from "../utils";
 
 
 const command: Command = {
-    desc: "Change directory",
+    desc: "切换目录",
     usage: "[path]",
-    details: ["With no arguments, returns to home directory (~).", "Supports ~, .., and absolute paths."],
+    details: ["不带参数时返回主目录（~）。", "支持 ~、.. 以及绝对路径。"],
     fn(args, ctx) {
         const target = args[0] ?? "~";
         const parts = resolveParts(ctx.cwd(), target);

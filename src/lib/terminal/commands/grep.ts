@@ -4,19 +4,19 @@ import {err, ok, s} from "../utils";
 
 
 const command: Command = {
-    desc: "Search for a pattern in file(s)",
+    desc: "在文件中搜索匹配内容",
     usage: "[-ri] <pattern> [file...]",
     details: [
-        "-r  search recursively through directories",
-        "-i  case-insensitive search",
-        "-n  show line numbers",
-        "Matches are highlighted in the output.",
+        "-r  递归搜索子目录",
+        "-i  忽略大小写",
+        "-n  显示行号",
+        "匹配内容会在输出中高亮显示。",
     ],
     fn(args, ctx) {
         const flags = args.filter(a => a.startsWith("-")).join("");
         const rest = args.filter(a => !a.startsWith("-"));
         const [pattern, ...filePaths] = rest;
-        if (!pattern) return err("grep: missing pattern");
+        if (!pattern) return err("grep: 缺少搜索模式");
 
         const ignoreCase = flags.includes("i");
         const showNums = flags.includes("n");

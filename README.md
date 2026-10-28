@@ -1,143 +1,151 @@
 <div align="center">
-  <a href="https://ghostty.zerebos.com"><img src="./src/lib/images/icon.webp" height="128" alt="Ghostty Config"></a>
+  <a href="https://notochen.github.io/ghostty-config/"><img src="./src/lib/images/icon.webp" height="128" alt="Ghostty Config"></a>
   <h1 align="center" style="border:0;">Ghostty Config</h1>
-  <p align="center">A beautiful intuitive configuration generator for <a href="https://ghostty.org/" target="_blank">Ghostty</a> terminal.</p>
+  <p align="center">Ghostty 终端的可视化配置生成器 · 全中文界面</p>
 
-[![GitHub Stars](https://www.shieldcn.dev/github/stars/zerebos/ghostty-config.svg?variant=secondary&size=sm)](https://github.com/zerebos/ghostty-config/stargazers)
-[![Build](https://www.shieldcn.dev/github/ci/zerebos/ghostty-config.svg?variant=secondary&size=sm)](https://github.com/zerebos/ghostty-config/actions)
+[![Build](https://www.shieldcn.dev/github/ci/NotoChen/ghostty-config.svg?variant=secondary&size=sm)](https://github.com/NotoChen/ghostty-config/actions)
+[![Ghostty](https://www.shieldcn.dev/badge/Ghostty-1.4.0-4D4D4D.svg?variant=secondary&size=sm)](https://ghostty.org/)
 [![Framework · Svelte](https://www.shieldcn.dev/badge/Framework-Svelte-FF3E00.svg?logo=svelte&variant=branded&size=sm)](https://svelte.dev)
-[![Hosting · Cloudflare Workers](https://www.shieldcn.dev/badge/Hosting-Cloudflare_Workers-F38020.svg?logo=cloudflare&variant=branded&size=sm)](https://ghostty.zerebos.com)
+[![Hosting · GitHub Pages](https://www.shieldcn.dev/badge/Hosting-GitHub_Pages-222222.svg?logo=github&variant=branded&size=sm)](https://notochen.github.io/ghostty-config/)
 
-  <img src="https://github.com/user-attachments/assets/b0937e12-d7ef-4bd1-a007-e468da2f7dfc" alt="Preview of the terminal colorizer">
+  <img src="https://github.com/user-attachments/assets/b0937e12-d7ef-4bd1-a007-e468da2f7dfc" alt="终端配色预览">
 </div>
 
+## 这是什么
 
-## Overview
+Ghostty Config 是一个网页版的 [Ghostty](https://ghostty.org/) 配置生成器：不用手写配置文件，点几下就能改字体、配色、光标、透明度和快捷键，改的过程里终端预览会**实时**跟着变，最后导出一份干净的配置。
 
-> [!NOTE]
-> This tool is still under active development. Features may change and not everything on the roadmap is implemented yet. Feedback, ideas, and bug reports are welcome via the [GitHub issue tracker](https://github.com/zerebos/ghostty-config/issues).
+本项目是在 [zerebos/ghostty-config](https://github.com/zerebos/ghostty-config) 基础上的二次开发（Fork），在原版之上主要做了这些改动：
 
-Ghostty Config is a beautiful web-based configuration generator designed to make customizing your [Ghostty](https://ghostty.org/) terminal effortless. Rather than manually editing text files and worrying about formatting and syntax, Ghostty Config allows you to visually adjust settings, preview changes in real time and export a ready-to-use config.
+- **全面中文化**：界面、设置项名称与说明、提示消息、公告文本全部改为中文。
+- **对齐 Ghostty 1.4.0**：按 `ghostty +show-config --default` 与 1.4.0 的配置规范逐项核对，共 211 个配置键，外加 `quick-terminal-size`。
+- **快捷键改成「真实按键」**：列表里显示的是键盘上实际按的键（⌘ ⇧ ⌃ ⌥ / T），而不是 `super+shift+comma` 这种写法；点击某行按键区域后直接按下组合键即可录入，编辑器里按下组合键也会自动勾选修饰键。
+- **快捷键作用说明**：每一行下方用中文说明这个操作的用途。
+- **本地配置对比**：一边是你机器上真实的配置文件，一边是应用内正在编辑的配置，逐项列出差异；写回时自动备份、自动校验、自动按功能模块分组加中文注释。
+- **在线版也能处理本地配置**：静态部署没有磁盘访问权限，所以支持**上传配置文件**或**粘贴配置文本**，对比、合并、注释分组的能力完全一致，最后下载合并结果替换原文件即可。
 
-Under the hood, every setting is driven by a typed schema derived directly from Ghostty's own config specification. The tool tracks only the values that differ from Ghostty's defaults, so the exported config stays minimal and easy to read. Settings are organized into categories that derive from Ghostty's config, and each one carries inline documentation, platform restrictions, and version metadata sourced from the schema.
-
-This project is built with [Svelte](https://svelte.dev) + [TypeScript](https://www.typescriptlang.org/) via [Bun](https://bun.sh). It is automatically deployed with Cloudflare Workers so the hosted version is always up to date.
-
-**Try it now:** [ghostty.zerebos.com](https://ghostty.zerebos.com)
-
-
-## Features
-
-- **Interactive settings editor:** Tweak fonts, colors, cursor styles, transparency, blur, and much more across organized, categorized setting pages.
-- **Rich setting inputs:** Purpose-built controls for every setting type, including sliders, linked number inputs, color pickers, and duration fields.
-- **Repeatable settings:** Manage multi-value settings like font features with a dedicated list editor.
-- **Built-in themes:** Hundreds of Ghostty color themes, automatically kept in sync with upstream.
-- **Font playground:** Experiment with JetBrains Mono, Nerd Fonts, or any custom font and see the result live.
-- **Live previews:** Instant visual demos for cursors, text selections, app icons, and color palettes as you edit.
-- **Interactive terminal preview:** A DOM-based terminal you can type in that re-themes live as you tweak settings, so existing output (colors, prompt, `ls` results) updates in place without being torn down.
-- **Keybinding builder:** Build and validate keybindings with an interactive trigger/action editor, including sequence, prefix, and chained-action support.
-- **Import & export:** Paste, upload, copy, or download configs; only settings that differ from defaults are included in the output.
-- **Config sharing:** Share configs with others via a shareable URL (falls back to clipboard copy for large configs).
-- **Help info:** Detailed documentation shown inline for every individual setting.
-- **Indicators:** Per-setting badges showing required platform (macOS, Linux, GTK) and minimum Ghostty version.
-- **Sidebar search:** Instantly browse and jump to any setting, mirroring macOS native preferences UI.
-- **Reset to defaults:** Restore any individual setting to its default value at any time.
+**在线体验：** [notochen.github.io/ghostty-config](https://notochen.github.io/ghostty-config/)
 
 
-## Tech Stack
+## 支持的 Ghostty 版本
 
-- [Bun](https://bun.sh/): A modern JavaScript and TypeScript runtime
-- [Svelte](https://svelte.dev): UI framework for fast, reactive interfaces
-- [TypeScript](https://www.typescriptlang.org/): Strong typing for maintainable code
-- [Vite](https://vite.dev/): Lightning‑fast bundler and dev server
-- [Cloudflare](https://developers.cloudflare.com/workers/): CI/CD for automated deployment
+**Ghostty 1.4.0。**
+
+版本号不是按本项目自己的发版节奏走的，而是**与所支持的 Ghostty 版本保持一致**：`package.json` 的 `version`、`src/lib/data/version.ts` 里的 `GHOSTTY_VERSION` 都等于 `1.4.0`。这样看到一个版本号就知道这份配置对得上哪个 Ghostty。上游 Ghostty 发布新版本、设置项重新核对之后，这两处会一起改。
+
+需要说明的几点：
+
+- **`link` 键没有收录**：Ghostty 1.4.0 已经移除了它，`ghostty +validate-config` 会直接报错，所以本工具不再提供。
+- **每个设置项都带版本与平台标记**：需要 macOS / Linux / GTK 的设置、从哪个版本开始出现，都会在对应行上标注。
+- **旧配置可以直接读**：`scrollback-limit` 等 1.4.0 改名的键在导入时会自动迁移；不认识的键会在对比表里标为「不识别」，合并时原样保留、不会被删掉。
 
 
-## Installation (Local Development)
+## 功能
 
-Simply clone the repo and run locally:
+- **交互式设置编辑**：字体、配色、光标、透明度、模糊、内边距等，按面板和功能分组。
+- **贴合类型的输入控件**：滑块、联动的双数字输入、取色器、时长输入、特性列表等，每个设置项都用最合适的控件。
+- **几百套内置主题**：与上游 iTerm2 Color Schemes 自动同步，选中即可实时预览。
+- **字体游乐场**：试用 JetBrains Mono、Nerd Font 或任意自定义字体，直接看到效果。
+- **实时预览**：光标、选区、应用图标、调色板都会随编辑即时更新。
+- **可交互的终端预览**：基于 DOM 的终端模拟，可以直接输入命令；改配色时已经渲染出来的内容会原地换肤，不会被清屏。
+- **快捷键编辑器**：支持前缀（`all:` / `global:` / `unconsumed:` / `performable:`）、按键序列、修饰键勾选与实时校验。
+- **导入与导出**：支持粘贴、上传、复制、下载和分享链接；导出时只包含与默认值不同的项。
+- **逐项内联说明**：每个设置项下方直接写清它是什么、怎么填，不需要点开帮助。
+- **侧边栏搜索**：像 macOS 系统设置一样，直接搜到任意设置并跳转。
+- **单项恢复默认**：任何一项都能一键还原。
+
+
+## 本地运行
+
+需要 [Bun](https://bun.sh) ≥ 1.3。
+
 ```bash
-git clone https://github.com/zerebos/ghostty-config.git
+git clone https://github.com/NotoChen/ghostty-config.git
 cd ghostty-config
 bun install
 bun run dev
 ```
-Then open `http://localhost:5173` in your browser when prompted.
 
-Other useful commands:
+打开终端里提示的 `http://localhost:5173`。
+
+常用命令：
+
 ```bash
-bun run build    # production build (output under build/)
-bun run preview  # serve the production build locally
-bun run check    # Svelte + TypeScript type checking
+bun run build    # 生产构建，产物在 build/
+bun run preview  # 本地预览生产构建
+bun run check    # Svelte + TypeScript 类型检查
 bun run lint     # ESLint
-bun run test     # Vitest unit tests
+bun run test     # Vitest 单元测试
 ```
 
-
-## Deployment
-
-The only automated deployment built-in is via Cloudflare Workers which automatically deploys to [ghostty.zerebos.com](https://ghostty.zerebos.com) on every push to the `main` branch. If you want to self-host, the static files will be available under `build/` after following the steps above to build.
+> 这台机器上如果没有 Bun，把上面的 `bun` 换成 `npx` 也能跑，例如 `npx vite dev`、`npx svelte-check`。
 
 
-## Roadmap
+## 「本地配置」页面
 
-### Completed
-- [x] Custom settings support
-- [x] Terminal preview
-- [x] Font playground
-- [x] Import & export
-- [x] Basic keybind settings
-- [x] Editable color pickers
-- [x] Update for Ghostty 1.1
-- [x] Update for Ghostty 1.2
-- [x] Update for Ghostty 1.3
-- [x] Update for Ghostty 1.4-nightly
-- [x] Icon customization
-- [x] Keybind builder and validation
-- [x] In-app help documentation
-- [x] Resetting individual settings
-- [x] Sidebar search like native
-- [x] Platform indicators
-- [x] Version indicators
-- [x] Shareable URLs
-- [x] Multi-entry setting support (settings like `font-feature` that repeat in the config)
-- [x] Custom schema-driven setting inputs (sliders, color pickers, durations, and more)
-- [x] Automatic theme sync from upstream [iTerm2 Color Schemes](https://github.com/mbadolato/iTerm2-Color-Schemes/)
-- [x] Unified typed settings registry
-- [x] Interactive terminal preview with live re-theming
-- [x] Unit tests for import/export flows
+这个页面把**你磁盘上的配置文件**和**应用内正在编辑的配置**并排放在一起，逐项列出差异，并能把应用内的改动合并回去。
 
-**Near-term**
-- [ ] Command palette builder (guided UI for `command-palette-entry` settings)
-- [ ] Community presets for quick theme/workflow setup
-- [ ] Unified color scheme across the app
+### 本机运行：直接读写磁盘
 
-**Long-term**
-- [ ] Desktop version for direct config file integration
-- [ ] Component testing
+用 `bun run dev`（或 `bun run preview`）启动时，Vite 开发服务器提供一个只在回环地址上可用的桥接接口 `GET/POST /__ghostty/local-config`，用来读写本机的 Ghostty 配置：
+
+- 每 4 秒自动重读一次文件，文件在别处被改过时页面会跟着刷新。
+- 写回前**一定**先备份为 `*.bak-时间戳`，再通过 `.tmp` 文件 + 重命名写入，中途崩溃也不会留下半截文件。
+- 写入前用你本机的 `ghostty +validate-config` 校验；如果文件里本来就有非法行，只要这次写入没有新增非法行就允许写入。
+- 只写应用内的非默认项；文件里你没载入过的自定义项原样保留。
+
+出于安全考虑，这个接口只监听回环地址、拒绝非 `localhost` 来源的请求，也从不添加 CORS 头。`vite build` 不会生成该接口，**线上部署的版本没有文件访问能力**。
+
+### 在线版：上传或粘贴
+
+静态部署（GitHub Pages）读不到磁盘，所以页面会改为让你**上传配置文件**或**粘贴配置文本**。文件只在浏览器里读取，不会上传到任何服务器；之后的对比、合并选项、注释分组、差异预览都和本机运行一致，只是最后一步从「直接写回磁盘」变成「下载合并后的文件」，由你自己替换 `~/.config/ghostty/config`（macOS 上是 `~/Library/Application Support/com.mitchellh.ghostty/config.ghostty`）。
+
+配置文件的位置：
+
+| 系统 | 路径 |
+|------|------|
+| macOS | `~/Library/Application Support/com.mitchellh.ghostty/config.ghostty`（旧版本为 `config`） |
+| Linux | `~/.config/ghostty/config` |
+
+如果只是想把自己的配置带进编辑器，用「导入与导出」页的粘贴 / 上传即可，不必走这个页面。
 
 
+## 部署
 
-## Contributing
+仓库自带两个 GitHub Actions 工作流：
 
-See the [CONTRIBUTING](./CONTRIBUTING.md) documentation for more info.
+- `.github/workflows/ci.yml`：跑单元测试、类型检查、Lint 和构建。
+- `.github/workflows/pages.yml`：推送到 `main` 后构建并发布到 GitHub Pages。
+
+GitHub Pages 的项目站点在 `https://<用户名>.github.io/<仓库名>/` 下，因此构建时会把 `BASE_PATH` 设为 `/<仓库名>`。本地 `bun run dev` / `bun run preview` 始终使用空 base，回环桥接不受影响。仓库改名后无需手改代码，工作流用的是 `github.event.repository.name`。
+
+首次使用时，在仓库的 **Settings → Pages → Build and deployment → Source** 里选择 **GitHub Actions**。
+
+也可以完全自托管：`bun run build` 之后把 `build/` 目录丢到任意静态服务器上即可。
 
 
-## License
+## 技术栈
 
-Licensed under the [Apache‑2.0 License](https://github.com/zerebos/ghostty-config/blob/main/LICENSE).
+- [Svelte 5](https://svelte.dev)（runes）+ [SvelteKit](https://kit.svelte.dev)：界面与静态站点生成
+- [TypeScript](https://www.typescriptlang.org/)：设置项注册表由类型驱动，`satisfies` 保证 `default` 与控件类型对得上
+- [Vite](https://vite.dev/)：开发服务器与构建
+- [Bun](https://bun.sh)：包管理与脚本运行
+- [GitHub Pages](https://pages.github.com/)：在线版托管
+
+设置系统由三份文件构成：`settings/types.ts`（数据结构）→ `settings/registry.ts`（每个配置键、默认值、控件）→ `settings/navigation.ts`（侧边栏位置）。三者必须保持同步，导航校验会在开发启动时直接抛错。
 
 
-## Star History
+## 参与开发
 
-If you find Ghostty Config useful, please consider starring the repo to help others discover it!
+见 [CONTRIBUTING](./CONTRIBUTING.md)。提交前请确保 `bun run check`、`bun run lint`、`bun run test` 三项全部通过。
 
-<p align="center">
-  <a href="https://star-history.com/#zerebos/ghostty-config&Date">
-   <picture>
-     <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=zerebos/ghostty-config&type=Date&theme=dark" />
-     <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=zerebos/ghostty-config&type=Date" />
-     <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=zerebos/ghostty-config&type=Date" />
-   </picture>
-  </a>
-</p>
+
+## 许可证与致谢
+
+以 [Apache-2.0](./LICENSE) 协议开源，与原项目保持一致。
+
+- 原始项目：[zerebos/ghostty-config](https://github.com/zerebos/ghostty-config)，作者 [@Zerebos](https://github.com/zerebos)。本仓库保留其版权声明。
+- 主题数据来自 [iTerm2-Color-Schemes](https://github.com/mbadolato/iTerm2-Color-Schemes/)。
+- 感谢 [Ghostty](https://ghostty.org/) 以及它的作者 Mitchell Hashimoto。
+
+如果这个工具对你有用，欢迎给[原项目](https://github.com/zerebos/ghostty-config)点个 Star。

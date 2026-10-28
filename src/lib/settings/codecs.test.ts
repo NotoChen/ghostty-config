@@ -192,6 +192,6 @@ describe("parseDuration", () => {
     });
 
     it("humanizes with singular/plural", () => {
-        expect(humanizeDuration(parseDuration("1h30m").segments)).toBe("1 Hour, 30 Minutes");
+        expect(humanizeDuration(parseDuration("1h30m").segments)).toBe("1 小时, 30 分钟");
     });
 });

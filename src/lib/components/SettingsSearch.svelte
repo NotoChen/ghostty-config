@@ -119,8 +119,8 @@
         value={searchState.query}
         oninput={handleSearchInput}
         onkeydown={handleSearchKeydown}
-        placeholder="Search"
-        aria-label="Search"
+        placeholder="搜索"
+        aria-label="搜索"
         autocomplete="off"
         spellcheck={false}
         bind:this={inputElement}
@@ -130,7 +130,7 @@
         <button
             class="search-clear-button"
             type="button"
-            title="Clear search"
+            title="清空搜索"
             transition:scale={{duration: 150}}
             onclick={() => {
                 setQuery("");
@@ -146,7 +146,7 @@
 
 <nav id="categories">
     {#if searchState.query}
-        <div id="search-results" role="listbox" aria-label="Search results">
+        <div id="search-results" role="listbox" aria-label="搜索结果">
             {#if hasGroupedResults()}
                 {#each getGroupedResults() as category (category.categoryId)}
                     <section class="search-category">
@@ -239,8 +239,8 @@
                         <path d="M0 0h56v56H0z" fill="none" />
                         <path fill="currentColor" d="M23.957 41.77a18.02 18.02 0 0 0 10.477-3.376l11.109 11.11a2.66 2.66 0 0 0 1.898.773c1.524 0 2.625-1.172 2.625-2.672c0-.703-.234-1.359-.75-1.874L38.277 34.668c2.32-3.047 3.703-6.82 3.703-10.922c0-9.914-8.109-18.023-18.023-18.023c-9.937 0-18.023 8.109-18.023 18.023S14.02 41.77 23.957 41.77m0-3.891c-7.758 0-14.133-6.398-14.133-14.133S16.2 9.613 23.957 9.613c7.734 0 14.133 6.399 14.133 14.133c0 7.735-6.399 14.133-14.133 14.133" />
                     </svg>
-                    <h2>No Results</h2>
-                    <p class="search-empty">No results for<span>"{searchState.query}"</span></p>
+                    <h2>无结果</h2>
+                    <p class="search-empty">未找到匹配项：<span>"{searchState.query}"</span></p>
                 </div>
 
             {/if}

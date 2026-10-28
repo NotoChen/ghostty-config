@@ -4,9 +4,9 @@ import {err, ok} from "../utils";
 
 
 const command: Command = {
-    desc: "Remove a file",
+    desc: "删除文件",
     usage: "[-r] <file>",
-    details: ["-r  remove directories recursively"],
+    details: ["-r  递归删除目录"],
     fn(args, ctx) {
         const recursive = args.includes("-r") || args.includes("-rf") || args.includes("-fr");
         const targets = args.filter(a => !a.startsWith("-"));

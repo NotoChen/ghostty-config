@@ -43,7 +43,7 @@ export const navigation = [
     {
         id: "application",
         icon: application,
-        name: "Application",
+        name: "应用",
         groups: [
             {
                 id: "main",
@@ -53,15 +53,15 @@ export const navigation = [
                     "desktopNotifications",
                     "configFile",
                     "configDefaultFiles",
-                    "link",
                     "linkUrl",
                     "linkPreviews",
+                    "linkOsc8",
                     "undoTimeout"
                 ]
             },
             {
                 id: "bell",
-                name: "Bell",
+                name: "响铃",
                 settings: [
                     "bellFeatures",
                     "bellAudioPath",
@@ -70,7 +70,7 @@ export const navigation = [
             },
             {
                 id: "startup",
-                name: "Startup",
+                name: "启动",
                 settings: [
                     "command",
                     "initialCommand",
@@ -84,7 +84,7 @@ export const navigation = [
             },
             {
                 id: "shutdown",
-                name: "Shutdown",
+                name: "退出",
                 settings: [
                     "waitAfterCommand",
                     "abnormalCommandExitRuntime",
@@ -95,11 +95,11 @@ export const navigation = [
             },
             {
                 id: "quickTerminal",
-                name: "Quick Terminal",
+                name: "快速终端",
                 settings: [
                     "quickTerminalPosition",
-                    "quickTerminalScreen",
                     "quickTerminalSize",
+                    "quickTerminalScreen",
                     "quickTerminalAnimationDuration",
                     "quickTerminalAutohide",
                     "quickTerminalSpaceBehavior",
@@ -111,7 +111,7 @@ export const navigation = [
     {
         id: "terminal",
         icon: terminal, // TODO: replace
-        name: "Terminal",
+        name: "终端",
         groups: [
             {
                 id: "shell",
@@ -124,8 +124,15 @@ export const navigation = [
                 ]
             },
             {
+                id: "keyboard",
+                name: "键盘",
+                settings: [
+                    "keyRemap"
+                ]
+            },
+            {
                 id: "notifications",
-                name: "Command Notifications",
+                name: "命令通知",
                 settings: [
                     "notifyOnCommandFinish",
                     "notifyOnCommandFinishAction",
@@ -134,9 +141,11 @@ export const navigation = [
             },
             {
                 id: "display",
-                name: "Display",
+                name: "显示",
                 settings: [
-                    "scrollbackLimit",
+                    "scrollbackLimitBytes",
+                    "scrollbackLimitLines",
+                    "scrollbackCompression",
                     "scrollToBottom",
                     "imageStorageLimit",
                     "progressStyle",
@@ -146,12 +155,15 @@ export const navigation = [
             },
             {
                 id: "compatibility",
-                name: "Protocol & Compatibility",
-                note: "These settings control low-level terminal protocol behavior. Only change these if you know what you're doing.",
+                name: "协议与兼容性",
+                note: "这些设置控制底层终端协议行为，不了解用途时请勿修改。",
                 settings: [
                     "oscColorReportFormat",
                     "enquiryResponse",
-                    "vtKamAllowed"
+                    "vtKamAllowed",
+                    "vtWindowResizeAllowed",
+                    "vtXtChecksumReport",
+                    "vtXtChecksumExtension"
                 ]
             }
         ]
@@ -159,7 +171,7 @@ export const navigation = [
     {
         id: "clipboard",
         icon: clipboard,
-        name: "Clipboard",
+        name: "剪贴板",
         groups: [
             {
                 id: "main",
@@ -167,8 +179,10 @@ export const navigation = [
                 settings: [
                     "clipboardRead",
                     "clipboardWrite",
+                    "clipboardWriteLimitBytes",
                     "copyOnSelect",
                     "clipboardTrimTrailingSpaces",
+                    "clipboardCodepointMap",
                     "clipboardPasteProtection",
                     "clipboardPasteBracketedSafe"
                 ]
@@ -178,7 +192,7 @@ export const navigation = [
     {
         id: "window",
         icon: window,
-        name: "Window",
+        name: "窗口",
         groups: [
             {
                 id: "main",
@@ -199,7 +213,7 @@ export const navigation = [
             },
             {
                 id: "appearance",
-                name: "Appearance",
+                name: "外观",
                 settings: [
                     "windowTheme",
                     "windowDecoration",
@@ -221,12 +235,13 @@ export const navigation = [
                     "unfocusedSplitOpacity",
                     "unfocusedSplitFill",
                     "splitDividerColor",
-                    "splitPreserveZoom"
+                    "splitPreserveZoom",
+                    "dragHandle"
                 ]
             },
             {
                 id: "resize",
-                name: "Sizing & Resizing",
+                name: "尺寸与缩放",
                 settings: [
                     "windowHeight",
                     "windowWidth",
@@ -243,7 +258,7 @@ export const navigation = [
     {
         id: "colors",
         icon: colors,
-        name: "Colors",
+        name: "颜色",
         groups: [
             {
                 id: "general",
@@ -259,8 +274,8 @@ export const navigation = [
             },
             {
                 id: "base",
-                name: "Base Colors",
-                note: "The preview here shows selected text in the second line of the command output.",
+                name: "基础颜色",
+                note: "此处的预览会在命令输出的第二行展示选中文本的效果。",
                 preview: "baseColor",
                 settings: [
                     "background",
@@ -274,7 +289,7 @@ export const navigation = [
             },
             {
                 id: "search",
-                name: "Search Colors",
+                name: "搜索颜色",
                 settings: [
                     "searchForeground",
                     "searchBackground",
@@ -284,8 +299,8 @@ export const navigation = [
             },
             {
                 id: "cursor",
-                name: "Cursor",
-                note: "The cursor in this preview blinks on and off at 1 second intervals for emphasis, it may not match what you see in Ghostty!",
+                name: "光标",
+                note: "预览中的光标以 1 秒为间隔闪烁，仅用于强调，可能与 Ghostty 中的实际效果不一致。",
                 preview: "cursor",
                 settings: [
                     "cursorColor",
@@ -297,8 +312,8 @@ export const navigation = [
             },
             {
                 id: "palette",
-                name: "Color Palette",
-                note: "The first 16 colors are the most commonly displayed colors in the terminal.\n\nColors 1-8 are typically black, red, green, yellow, blue, magenta, cyan, and white.\nColors 9-16 are typically \"brighter\" variants of these colors.",
+                name: "调色板",
+                note: "前 16 种颜色是终端中最常显示的颜色。\n\n1-8 通常为黑、红、绿、黄、蓝、品红、青、白。\n9-16 通常是这些颜色的\"较亮\"变体。",
                 preview: "palette",
                 settings: [
                     "palette"
@@ -309,7 +324,7 @@ export const navigation = [
     {
         id: "fonts",
         icon: fonts,
-        name: "Fonts",
+        name: "字体",
         groups: [
             {
                 id: "general",
@@ -328,8 +343,8 @@ export const navigation = [
             },
             {
                 id: "family",
-                name: "Font Families",
-                note: "By default Ghostty embeds and uses JetBrainsMono Nerd Font so you don't need to install it on your system or set it in your configuration.",
+                name: "字体族",
+                note: "Ghostty 默认内置并使用 JetBrainsMono Nerd Font，无需在系统里安装或在配置中指定。",
                 settings: [
                     "fontFamily",
                     "fontFamilyBold",
@@ -340,8 +355,8 @@ export const navigation = [
             },
             {
                 id: "styles",
-                name: "Font Styles",
-                note: "Named font styles for the fields above. For example for <code>Ioveska Heavy</code> you would use a style of <code>Heavy</code>. Alternately you can set the style to <code>false</code> to completely disable the style and revert to default style.",
+                name: "字体样式",
+                note: "为上方各项指定具名字体样式。例如字体为 <code>Ioveska Heavy</code> 时，样式填 <code>Heavy</code>。也可以把样式设为 <code>false</code> 完全禁用该样式，回退到默认样式。",
                 settings: [
                     "fontStyle",
                     "fontStyleBold",
@@ -351,8 +366,8 @@ export const navigation = [
             },
             {
                 id: "variations",
-                name: "Font Variations",
-                note: "Variable font specific settings, please only touch this if you know what you're doing!",
+                name: "字体变体",
+                note: "可变字体专用设置，不了解时请勿修改！",
                 settings: [
                     "fontVariation",
                     "fontVariationBold",
@@ -362,8 +377,8 @@ export const navigation = [
             },
             {
                 id: "advanced",
-                name: "Metric Adjustments",
-                note: "Fine-grained pixel/percentage tweaks to cell and glyph metrics. These have very little validation in Ghostty and can make your terminal unusable. Be careful messing with any of these.",
+                name: "度量微调",
+                note: "以像素或百分比微调单元格与字形度量。Ghostty 对这类值几乎不做校验，改错会让终端无法使用，请谨慎调整。",
                 settings: [
                     "adjustCellWidth",
                     "adjustCellHeight",
@@ -385,7 +400,7 @@ export const navigation = [
     {
         id: "keybinds",
         icon: keybinds,
-        name: "Keybinds",
+        name: "快捷键",
         groups: [
             {
                 id: "keybinds",
@@ -399,7 +414,7 @@ export const navigation = [
     {
         id: "mouse",
         icon: mouse,
-        name: "Mouse",
+        name: "鼠标",
         groups: [
             {
                 id: "main",
@@ -438,7 +453,7 @@ export const navigation = [
             },
             {
                 id: "tabs",
-                name: "Titlebar & Tabs",
+                name: "标题栏与标签页",
                 settings: [
                     "gtkToolbarStyle",
                     "gtkTitlebarStyle",
@@ -446,6 +461,8 @@ export const navigation = [
                     "gtkWideTabs",
                     "gtkTitlebar",
                     "gtkTitlebarHideWhenMaximized",
+                    "gtkTabsInverted",
+                    "gtkHorizontalTabScroll",
                     "gtkQuickTerminalLayer",
                     "gtkQuickTerminalNamespace"
                 ]
@@ -491,14 +508,15 @@ export const navigation = [
                     "macosApplescript",
                     "macosDockDropBehavior",
                     "macosShortcuts",
+                    "commandPaletteEntry",
                     "autoUpdate",
                     "autoUpdateChannel"
                 ]
             },
             {
                 id: "icon",
-                name: "App Icon",
-                note: "If you choose the <code>custom-style</code> option, you can use any of the other icon settings to customize your icon with a live preview.",
+                name: "应用图标",
+                note: "选择 <code>custom-style</code> 后，可用其余图标设置实时预览并定制图标。",
                 preview: "appIcon",
                 settings: [
                     "macosIcon",

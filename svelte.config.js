@@ -17,10 +17,14 @@ const config = {
             fallback: "404.html"
         }),
         paths: {
-            // The commented out part below is if I serve it under zerebos.github.io/<repo>
-            // then the BASE_PATH would be set in the workflow to /<repo>
-            // but for this project it is being aliased/served at a subdomain root
-            base: "" // process.argv.includes("dev") ? "" : process.env.BASE_PATH
+            // GitHub Pages serves a project site under /<repo>, while `vite dev` / `vite preview`
+            // stay at the root (the local-config bridge is loopback-only and must keep working).
+            // The Pages workflow sets BASE_PATH=/ghostty-config; a plain local build keeps "".
+            base: process.argv.includes("dev") || process.argv.includes("preview") ? "" : (process.env.BASE_PATH ?? ""),
+            // Absolute asset URLs (base-prefixed) rather than `./_app/...`. Deep links like
+            // /app/local-config are answered by the 404.html fallback, whose relative paths would
+            // otherwise resolve against the wrong directory and 404 the whole bundle.
+            relative: false
         }
     }
 };

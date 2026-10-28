@@ -16,22 +16,22 @@ export interface PreviewState {
 
 const SOURCE_INFO: Record<ImportSource, {title: string; description: string; noConfigMessage: string; successMessage: string;}> = {
     share: {
-        title: "Shared Config",
-        description: "Someone shared a Ghostty config with you. Review it before importing.",
-        noConfigMessage: "We couldn't find any valid config settings in the shared URL.",
-        successMessage: "Shared config imported"
+        title: "共享配置",
+        description: "有人与你分享了一份 Ghostty 配置，导入前请先检查。",
+        noConfigMessage: "分享链接中没有找到有效的配置项。",
+        successMessage: "共享配置已导入"
     },
     clipboard: {
-        title: "Import Config",
-        description: "Importing will overwrite any changes you have made. Review it before importing.",
-        noConfigMessage: "We couldn't find any valid config settings in the clipboard you provided.",
-        successMessage: "Config imported"
+        title: "导入配置",
+        description: "导入会覆盖你当前的所有改动，导入前请先检查。",
+        noConfigMessage: "你提供的剪贴板内容中没有找到有效的配置项。",
+        successMessage: "配置已导入"
     },
     file: {
-        title: "Import Config",
-        description: "Importing will overwrite any changes you have made. Review it before importing.",
-        noConfigMessage: "We couldn't find any valid config settings in the file you provided.",
-        successMessage: "Config imported"
+        title: "导入配置",
+        description: "导入会覆盖你当前的所有改动，导入前请先检查。",
+        noConfigMessage: "你提供的文件中没有找到有效的配置项。",
+        successMessage: "配置已导入"
     }
 };
 
@@ -63,7 +63,7 @@ export function checkTextForImport(source: ImportSource, text: string) {
     const hasKeys = preview.parsedDiff && Object.keys(preview.parsedDiff).length > 0;
 
     if (!hasKeys && !preview.parseError) {
-        void showAlert({title: "No config found", message: SOURCE_INFO[source].noConfigMessage, buttonText: "Dismiss"});
+        void showAlert({title: "未找到配置", message: SOURCE_INFO[source].noConfigMessage, buttonText: "关闭"});
         if (source === "share") clearHash();
         return;
     }
@@ -81,7 +81,7 @@ export function checkHashForShare() {
         checkTextForImport("share", decodeConfig(payload));
     }
     catch {
-        error("Failed to read shared config from URL");
+        error("无法从 URL 读取共享配置");
         clearHash();
     }
 }
@@ -97,9 +97,9 @@ export async function applyIncomingImport() {
     catch (err) {
         console.error(err); // eslint-disable-line no-console
         await showAlert({
-            title: "Could not load config",
-            message: "Something went wrong while loading your parsed config. Please open an issue on GitHub.",
-            buttonText: "Dismiss"
+            title: "无法加载配置",
+            message: "加载解析后的配置时出错，请在 GitHub 上提交 issue。",
+            buttonText: "关闭"
         });
     }
 

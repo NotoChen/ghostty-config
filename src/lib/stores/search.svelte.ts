@@ -116,7 +116,9 @@ const searchableSettings = (() => {
                 const setting = registry[id] as SettingsRegistry[keyof SettingsRegistry];
                 const cleanedNote = setting.note ? stripHtmlRegex(setting.note) : "";
                 const cleanedDescription = setting.description ? stripMarkdownRegex(setting.description) : "";
-                const searchableText = [category.name, group.name, setting.name, cleanedNote, cleanedDescription];
+                // The raw Ghostty key is included so English/`config-key` queries still match
+                // after the UI copy was localized to Chinese.
+                const searchableText = [category.name, group.name, setting.name, setting.key, cleanedNote, cleanedDescription];
 
                 results.push({
                     categoryId: category.id,

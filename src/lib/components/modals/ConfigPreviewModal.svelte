@@ -24,8 +24,8 @@
     <p class="modal-desc">{description}</p>
     <ConfigPreview parsed={parsedConfig} parsedDiff={parsedConfig} text={previewText} {parseError} showEmptyState={false} clampHeight />
     {#snippet footer()}
-        <Button onclick={onclose}>Dismiss</Button>
-        <Button primary onclick={onimport} disabled={!parsedConfig}>Import Config</Button>
+        <Button onclick={onclose}>取消</Button>
+        <Button primary onclick={onimport} disabled={!parsedConfig}>导入配置</Button>
     {/snippet}
 </DialogModal>
 

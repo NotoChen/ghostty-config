@@ -57,11 +57,11 @@
         value = $bindable(""),
         options = [],
         groups,
-        placeholder = "Select",
+        placeholder = "请选择",
         searchable = false,
         allowEmpty = false,
-        emptyLabel = "Clear selection",
-        noResultsLabel = "No results",
+        emptyLabel = "清除选择",
+        noResultsLabel = "无结果",
         disabled = false,
         iconSize = 16,
         maxWidth = 320,
@@ -417,7 +417,7 @@
                         bind:this={searchEl}
                         bind:value={query}
                         type="text"
-                        placeholder="Search"
+                        placeholder="搜索"
                     />
                 </div>
             {/if}

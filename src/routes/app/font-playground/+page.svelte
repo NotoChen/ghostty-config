@@ -3,6 +3,6 @@
     import FontPreview from "$lib/views/FontPreview.svelte";
 </script>
 
-<Page title="Font Playground">
+<Page title="字体游乐场">
     <FontPreview />
 </Page>

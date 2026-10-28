@@ -4,6 +4,6 @@
     import Keybinds from "$lib/components/settings/Keybinds.svelte";
 </script>
 
-<Page title="Keybinds">
+<Page title="快捷键">
     <Keybinds bind:value={config.keybind} />
 </Page>

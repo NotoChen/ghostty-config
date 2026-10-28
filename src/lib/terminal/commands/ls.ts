@@ -42,13 +42,13 @@ function buildPermissions(name: string, node: FSNode): Segment[] {
 // const LONG_HEADER = [s.underline("Permissions"), s.plain(" "), s.underline("Size"), s.plain(" "), s.underline("User"), s.plain(" "), s.underline("Date Modified"), s.plain(" "), s.underline("Name")];
 
 const command: Command = {
-    desc: "List directory contents (eza-like)",
+    desc: "列出目录内容（类似 eza）",
     usage: "[-la] [path]",
     details: [
-        "-l  long listing format",
-        "-a  include hidden files (dotfiles)",
-        "Directories shown in blue, executables in green, archives in red,",
-        "images in magenta, documents in cyan, data files in yellow.",
+        "-l  以长格式列出",
+        "-a  包含隐藏文件（点文件）",
+        "目录为蓝色，可执行文件为绿色，压缩包为红色，",
+        "图片为品红，文档为青色，数据文件为黄色。",
     ],
     fn(args, ctx) {
         const flagStr = args.filter(a => a.startsWith("-")).join("");
