@@ -123,11 +123,21 @@ A real emulator like `ghostty-web` keeps its state inside a surface that must be
 - `ghostty-web` was removed as a dependency along with the old `LivePreview.svelte` / `InteractiveTerminal.svelte` views and the dev-only `/app/live-preview` route. Don't reintroduce them.
 - A genuinely-usable in-browser terminal is a *different product* (a "playground"), not the config preview. If that's ever built, it lives as a separate surface — it does not replace the DOM preview.
 
+### Preview fidelity: two files, one contract
+
+`utils/previewVars.ts` is the **entire** config → CSS mapping (`previewVars()` / `previewStyle()`, plus the small parsers `unitOffset`, `paddingPair`, `fontFeatureSettings`, `blurRadius`). `settings/previewCoverage.ts` is the authoritative list of which registry keys that mapping (or the terminal/preview components) actually read — it powers the 「可预览」 eye badge on each row and the per-page 「本页 N/M 项可预览」 note.
+
+The pair is a contract, not documentation: a key listed in `previewedSettings` but never read by the preview claims feedback that never arrives, and a preview mapping with no listing makes a working preview look inert. **Change both in the same commit.** Everything absent is deliberate — native window chrome, keybinds, GTK/Linux/macOS behaviour, VT protocol switches, and metrics CSS cannot express (`adjust-font-baseline`, strikethrough/overline thickness) are config-only, and the UI now says so instead of pretending otherwise.
+
+`+layout.svelte` still owns the live config's colors; a second config's vars come from `utils/configVars.ts` for the side-by-side view.
+
 ### Placement: docked by default, floating on request
 
 `TerminalPreview.svelte` is the **only** surface that hosts `InteractiveTerminalDom`. It renders the same component tree in both placements, so popping the preview out to a window and docking it back keeps scrollback and command history — do not split this back into two components that each mount their own terminal.
 
-`app.previewMode` / `app.previewVisible` in `stores/state.svelte.ts` are placement-neutral; the old `floatingTerminal*` flags are gone. Keep it that way: `docked` is the default split (settings left, preview right, `--preview-width` in `app.css`), and anything new that toggles the preview should go through these two fields rather than adding a third flag.
+`app.previewMode` / `app.previewVisible` / `app.previewWidth` in `stores/state.svelte.ts` are placement-neutral; the old `floatingTerminal*` flags are gone. Keep it that way: `docked` is the default split (settings left, preview right), and anything new that toggles the preview should go through these fields rather than adding another flag.
+
+The docked width has exactly one source of truth: `app.previewWidth`, set as the pane's inline `width` and changed only by the divider (`startDockResize`, plus arrow keys for keyboard users) or `clampPreviewWidth`. Placement — mode, width, visibility — is a per-visitor convenience persisted in localStorage under `ghostty-config:preview` (never in the config, never exported); `savePreview()` is called from an effect in `TerminalPreview` that reads the fields through the store write itself.
 
 `Page.svelte`'s header is absolutely positioned against `#content-view`, which is `position: relative`, so it stops at the preview pane instead of running underneath it. If you change those anchors, check that narrow views (the pane collapses below a 900px viewport) still render the header correctly.
 

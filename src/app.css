@@ -6,8 +6,6 @@
     --app-width: 1180px;
     --app-height: 740px;
     --sidebar-width: 215px;
-    /* Right-hand live-preview pane in the default split layout. */
-    --preview-width: clamp(300px, 30vw, 400px);
 
     /* Put -apple-system and BlinkMacSystemFont first for sf pro on macOS */
     /* Base text variables */

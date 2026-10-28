@@ -21,9 +21,11 @@
         // Tooltip text; when present, a "theme" badge marks the value as coming from the
         // active theme (rather than an explicit override or the app default).
         themeBadge?: string;
+        // True when `settings/previewCoverage.ts` says this setting changes the live preview.
+        previewed?: boolean;
     }
 
-    const {name = "", note = "", platform, since, description, settingId, children, onReset, isNonDefault = false, inline = true, themeBadge}: Props = $props();
+    const {name = "", note = "", platform, since, description, settingId, children, onReset, isNonDefault = false, inline = true, themeBadge, previewed = false}: Props = $props();
     const tooltipAttachment = createTooltipAttachment("恢复默认值");
 
 
@@ -46,18 +48,20 @@
     };
 
     const infoBadges = $derived.by(() => {
-        const badges: Array<{label: string, type: "platform" | "version" | "theme"}> = [];
+        const badges: Array<{label: string, type: "platform" | "version" | "theme" | "preview"}> = [];
         const platformBadge = getPlatformBadgeLabel(platformLabels);
         if (platformBadge) badges.push({label: platformBadge, type: "platform"});
         if (since) badges.push({label: since, type: "version"});
         if (themeBadge) badges.push({label: "来自主题", type: "theme"});
+        if (previewed) badges.push({label: "可预览", type: "preview"});
         return badges;
     });
 
-    const getBadgeTooltip = (badge: {label: string, type: "platform" | "version" | "theme"}) => {
+    const getBadgeTooltip = (badge: {label: string, type: "platform" | "version" | "theme" | "preview"}) => {
         if (badge.type === "platform") return platformLabels.length > 1 ? `可用平台：${platformLabels.join("、")}` : `平台：${platformLabels[0]}`;
         if (badge.type === "version") return `Ghostty v${since} 起支持`;
         if (badge.type === "theme") return themeBadge ?? "";
+        if (badge.type === "preview") return "改动会在右侧的实时预览中体现";
         return "";
     };
 

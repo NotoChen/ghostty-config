@@ -2,7 +2,7 @@
     import {onMount, tick} from "svelte";
     import {fade, fly} from "svelte/transition";
     import InteractiveTerminalDom from "$lib/views/InteractiveTerminalDom.svelte";
-    import app from "$lib/stores/state.svelte";
+    import app, {clampPreviewWidth, MAX_PREVIEW_WIDTH, MIN_PREVIEW_WIDTH, savePreview} from "$lib/stores/state.svelte";
     import config from "$lib/stores/config.svelte";
     import {clearRecentChanges, recentChanges, trackConfig} from "$lib/stores/preview.svelte";
 
@@ -24,6 +24,7 @@
     let height = $state(DEFAULT_HEIGHT);
     let dragging = $state(false);
     let resizing = $state(false);
+    let resizingDock = $state(false);
     let animating = $state(false);
     let viewportWidth = $state(typeof window === "undefined" ? 1440 : window.innerWidth);
     let resizeDirection: ResizeDirection | null = null;
@@ -31,6 +32,8 @@
     let dragOffsetY = 0;
     let resizeStartX = 0;
     let resizeStartY = 0;
+    let dockStartX = 0;
+    let dockStartWidth = 0;
     let startWidth = DEFAULT_WIDTH;
     let startHeight = DEFAULT_HEIGHT;
     let startLeft = 0;
@@ -47,6 +50,12 @@
     // Record what the editor changed so the chips in the preview can name the difference.
     $effect(() => {
         trackConfig(config);
+    });
+
+    // Placement is a per-visitor convenience, so remember it across reloads. savePreview() reads
+    // mode/width/visible, so the effect re-runs whenever any of them changes.
+    $effect(() => {
+        savePreview();
     });
 
     // Every new change flashes the pane border once. Keyed on the newest chip's id — writing a
@@ -74,10 +83,31 @@
         startTop = y;
     }
 
+    /**
+     * Drag the split divider. The pane width is the only thing that changes, so the settings
+     * column gets whatever is left — the split stays a real two-pane layout rather than an overlay.
+     */
+    function startDockResize(e: MouseEvent) {
+        if (!isDocked) return;
+        e.preventDefault();
+        e.stopPropagation();
+        resizingDock = true;
+        dockStartX = e.clientX;
+        dockStartWidth = app.previewWidth;
+    }
+
     $effect(() => {
-        if (!dragging && !resizing) return;
+        if (!dragging && !resizing && !resizingDock) return;
 
         function onMove(e: MouseEvent) {
+            if (resizingDock) {
+                const parentWidth = windowElement?.parentElement?.getBoundingClientRect().width ?? window.innerWidth;
+                // Leave room for the sidebar and a usable settings column before the pane gets wide.
+                const available = Math.max(MIN_PREVIEW_WIDTH, Math.min(MAX_PREVIEW_WIDTH, parentWidth - 420));
+                app.previewWidth = clampPreviewWidth(Math.min(available, dockStartWidth - (e.clientX - dockStartX)));
+                return;
+            }
+
             if (dragging) {
                 x = Math.max(0, Math.min(window.innerWidth - width, e.clientX - dragOffsetX));
                 y = Math.max(0, Math.min(window.innerHeight - height, e.clientY - dragOffsetY));
@@ -155,6 +185,7 @@
             dragging = false;
             resizing = false;
             resizeDirection = null;
+            resizingDock = false;
         }
 
         window.addEventListener("mousemove", onMove);
@@ -338,7 +369,7 @@
     class:docked-hidden={isDocked && !app.previewVisible}
     style:left={isDocked ? undefined : `${x}px`}
     style:top={isDocked ? undefined : `${y}px`}
-    style:width={isDocked ? undefined : `${width}px`}
+    style:width={isDocked ? `${app.previewWidth}px` : `${width}px`}
     style:height={isDocked ? undefined : `${height}px`}
     style:cursor={dragging ? "grabbing" : undefined}
     role="dialog"
@@ -347,6 +378,19 @@
     aria-modal="false"
 >
     {#if isDocked}
+        <button
+            type="button"
+            class="dock-divider"
+            class:active={resizingDock}
+            onmousedown={startDockResize}
+            aria-label={`拖动调整预览宽度（当前 ${app.previewWidth}px）`}
+            title="拖动调整预览宽度"
+            onkeydown={(e) => {
+                if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+                e.preventDefault();
+                app.previewWidth = clampPreviewWidth(app.previewWidth + (e.key === "ArrowLeft" ? 24 : -24));
+            }}
+        ></button>
         <div class="titlebar docked-titlebar">
             <span class="live-dot" aria-hidden="true"></span>
             <span class="window-title">实时预览</span>
@@ -434,17 +478,54 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background: var(--config-bg);
+    /* Transparent so `background-opacity` can show the wallpaper behind the pane; the tint and the
+       background image are painted by .terminal-body. */
+    background: transparent;
     position: relative;
 }
 
 /* --- docked: the default right-hand split pane --- */
 .ghostty-window.docked {
-    flex: 0 0 var(--preview-width);
-    width: var(--preview-width);
+    /* Width comes from app.previewWidth (the inline style), so the divider drag has one source
+       of truth; `0 0 auto` keeps the pane from being stretched by the flex row. */
+    flex: 0 0 auto;
     height: 100%;
     z-index: 1;
-    border-left: 2px solid var(--border-level-1);
+}
+
+.dock-divider {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 7px;
+    cursor: col-resize;
+    z-index: 7;
+    background: none;
+    border: none;
+    padding: 0;
+    touch-action: none;
+}
+
+.dock-divider::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 2px;
+    background: var(--border-level-1);
+    transition: background-color 140ms ease;
+}
+
+.dock-divider:hover::after,
+.dock-divider:focus-visible::after,
+.dock-divider.active::after {
+    background: var(--color-input-accent);
+}
+
+.dock-divider:focus-visible {
+    outline: none;
 }
 
 .ghostty-window.docked-hidden {
@@ -463,6 +544,8 @@
     border-bottom: 1px solid var(--border-separator);
     color: var(--font-color);
     user-select: none;
+    position: relative;
+    z-index: 1;
 }
 
 .docked-titlebar .window-title {
@@ -555,6 +638,8 @@
     cursor: grab;
     user-select: none;
     transition: border-color 250ms cubic-bezier(0, 0.3, 0.7, 1);
+    position: relative;
+    z-index: 1;
 }
 
 .floating .titlebar:active {
@@ -613,6 +698,26 @@
     overflow: hidden;
     min-height: 0;
     position: relative;
+    z-index: 1;
+    /* Ghostty's window background: the config color at its configured opacity over the wallpaper,
+       blurred by `background-blur`. */
+    background: color-mix(in srgb, var(--config-bg) calc(var(--config-bg-opacity) * 100%), transparent);
+    backdrop-filter: blur(var(--config-blur));
+}
+
+/* `background-image` is drawn above that tint (Ghostty blends it over the base color) but below
+   the cells, and it stays put while the terminal scrolls. */
+.terminal-body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--config-bg-image);
+    background-position: var(--config-bg-image-position);
+    background-size: var(--config-bg-image-fit);
+    background-repeat: var(--config-bg-image-repeat);
+    opacity: var(--config-bg-image-opacity);
+    pointer-events: none;
+    z-index: 0;
 }
 
 .change-overlay {

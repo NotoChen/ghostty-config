@@ -34,11 +34,16 @@
     import ScrollMultiplier from "$lib/components/settings/ScrollMultiplier.svelte";
     import NumberWithUnits from "$lib/components/settings/NumberWithUnits.svelte";
     import {type DropdownOption, type FeatureDef, type PillOption, type SettingsRegistry, type SpecialValue} from "$lib/settings/types";
+    import {isPreviewed, previewCoverage} from "$lib/settings/previewCoverage";
 
 
     const {params} = $derived($page);
     const category = $derived(navigation.find(c => c.id === params.category));
     const title = $derived(category?.name ?? params.category);
+
+    // How much of this page the right-hand preview can show. The set lives in
+    // settings/previewCoverage.ts, so this number can never drift from what's actually wired.
+    const coverage = $derived(previewCoverage(category?.groups.flatMap(group => group.settings) ?? []));
 
     // Color editors display the *effective* color (override > theme > default) so the picker
     // always agrees with the preview; edits write an override into config, and reset/right-click
@@ -93,6 +98,15 @@
         {:else if category.id === "colors"}
             <Admonition size="1.5rem">右键单击颜色可将其恢复为默认值！</Admonition>
         {/if}
+        {#if coverage.previewed > 0}
+            <p class="coverage-note">
+                本页 {coverage.previewed}/{coverage.total} 项标有眼睛图标，改动会直接反映在右侧的实时预览里；其余设置要么只影响 Ghostty 本身的行为（快捷键、窗口管理、原生平台选项、协议开关等），要么依赖网页还原不了的能力，只能写进配置。
+            </p>
+        {:else}
+            <p class="coverage-note">
+                这一页的设置都不影响终端画面本身，因此右侧预览不会随它们变化——它们只会被写进导出的配置。
+            </p>
+        {/if}
         {#each category.groups as group (group.id)}
             <Group title={group.name} note={"note" in group ? group.note : undefined}>
                 {@const previewKey = "preview" in group ? group.preview : undefined}
@@ -115,6 +129,7 @@
                         description={setting.description}
                         isNonDefault={isNonDefault(settingId)}
                         themeBadge={themeBadgeText(settingId)}
+                        previewed={isPreviewed(settingId)}
                         inline={widget?.type !== "palette"}
                         onReset={() => {
                             resetSetting(settingId);
@@ -174,3 +189,12 @@
         <p>这里不该出现。如果你是点击链接进来的，请在 GitHub 上反馈这个 bug；否则可以直接从左侧开始浏览。</p>
     {/if}
 </Page>
+
+<style>
+.coverage-note {
+    margin: 0 0 16px;
+    color: var(--font-color-muted);
+    font-size: 0.82rem;
+    line-height: 1.55;
+}
+</style>

@@ -323,13 +323,20 @@
 
 <style>
 .term {
-    background: var(--config-bg);
+    /* The pane background is painted by the host (TerminalPreview) so background-opacity and
+       background-image can layer under the text; the terminal itself stays transparent. */
+    background: transparent;
     color: var(--config-fg);
     font-family: var(--config-font-family);
     font-size: var(--config-font-size);
+    font-feature-settings: var(--config-font-feature);
+    font-variation-settings: var(--config-font-variation);
+    letter-spacing: var(--config-letter-spacing);
+    line-height: var(--config-line-height);
+    -webkit-text-stroke: var(--config-text-stroke);
     /* Theme/color edits ease in instead of snapping, so the change in the preview is visible. */
-    transition: color 220ms ease, background-color 220ms ease;
-    padding: 10px;
+    transition: color 220ms ease;
+    padding: var(--config-padding-top) var(--config-padding-right) var(--config-padding-bottom) var(--config-padding-left);
     border-radius: var(--radius-level-3);
     border: 1px solid rgba(0, 0, 0, 0.5);
     box-shadow: 0 0 1px rgba(255, 255, 255, 0.5) inset;
@@ -338,6 +345,11 @@
     overflow-y: auto;
     height: 360px;
     user-select: text;
+    /* Above the host's background-image layer (see TerminalPreview .terminal-body::before). */
+    position: relative;
+    z-index: 1;
+    /* `scrollbar: never` in Ghostty hides the scrollbar but keeps the pane scrollable. */
+    scrollbar-width: var(--config-scrollbar);
 }
 
 .term.standalone {
@@ -366,10 +378,27 @@
     min-height: 1.4em;
 }
 
-.bold   {font-weight: 700;}
-.dimmed {opacity: 0.55;}
-.italic {font-style: italic;}
-.underline {text-decoration: underline;}
+.bold   {
+    font-weight: 700;
+    font-family: var(--config-font-family-bold);
+    font-variation-settings: var(--config-font-variation-bold);
+    color: var(--config-bold);
+}
+.dimmed {opacity: var(--config-faint-opacity);}
+.italic {
+    font-style: italic;
+    font-family: var(--config-font-family-italic);
+    font-variation-settings: var(--config-font-variation-italic);
+}
+.bold.italic {
+    font-family: var(--config-font-family-bold-italic);
+    font-variation-settings: var(--config-font-variation-bold-italic);
+}
+.underline {
+    text-decoration: underline;
+    text-decoration-thickness: var(--config-underline-thickness);
+    text-underline-offset: var(--config-underline-offset);
+}
 .inverse {background: var(--config-fg); color: var(--config-bg);}
 .href {text-decoration: underline; cursor: pointer;}
 
@@ -409,25 +438,25 @@
     background: transparent;
     color: var(--config-cursor-color);
     text-decoration: none; /* Override the default underline to position it better */
-    border-bottom: 1px solid var(--config-cursor-color);
+    border-bottom: var(--config-cursor-thickness) solid var(--config-cursor-color);
 }
 
 .cursor.bar {
     background: transparent;
     color: var(--config-cursor-color);
-    border-left: 1px solid var(--config-cursor-color);
+    border-left: var(--config-cursor-thickness) solid var(--config-cursor-color);
 }
 
 .cursor.block_hollow {
     color: transparent;
     background: transparent;
-    border: 1px solid var(--config-cursor-color);
+    border: var(--config-cursor-thickness) solid var(--config-cursor-color);
 }
 
 .term:not(:focus) .cursor.block {
     background: transparent;
     color: var(--config-cursor-color);
-    border: 1px solid var(--config-cursor-color);
+    border: var(--config-cursor-thickness) solid var(--config-cursor-color);
 }
 
 .term:focus .cursor.blink {

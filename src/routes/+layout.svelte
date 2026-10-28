@@ -21,9 +21,8 @@
     import terminal from "$lib/images/tabs/terminal.webp";
 
     import config from "$lib/stores/config.svelte";
-    import {numberCodec} from "$lib/settings/codecs";
     import {effectiveColors} from "$lib/stores/theme.svelte";
-    import {resolveCellColor} from "$lib/utils/colors";
+    import {previewStyle} from "$lib/utils/previewVars";
     import app from "$lib/stores/state.svelte";
     import navigation, {tabGroups} from "$lib/settings/navigation";
 
@@ -31,36 +30,10 @@
     // The single funnel for the color keys: everything below reads the *effective* colors
     // (override > theme > default, see stores/theme.svelte.ts) and every other surface reads
     // the resulting --config-* CSS vars, inheriting the layered colors for free.
-    const cssConfigVars = $derived.by(() => {
-        let str = "";
-
-        const add = (key: string, val: string) => str += `--config-${key}: ${val};`;
-
-        // Add the base colors. Cursor/selection colors may hold `cell-foreground`/`cell-background`
-        // keywords, so resolve those against fg/bg before emitting them as CSS colors.
-        const colors = effectiveColors();
-        const fg = colors.foreground;
-        const bg = colors.background;
-        add("bg", bg);
-        add("fg", fg);
-        add("selection-bg", resolveCellColor(colors.selectionBackground, fg, bg) || fg);
-        add("selection-fg", resolveCellColor(colors.selectionForeground, fg, bg) || bg);
-        add("cursor-color", resolveCellColor(colors.cursorColor, fg, bg) || fg);
-        add("cursor-text", resolveCellColor(colors.cursorText, fg, bg) || bg);
-        // Coerced here so downstream CSS (color-mix in CursorPreview) always gets a number.
-        add("cursor-opacity", String(numberCodec.parse(config.cursorOpacity) ?? 1));
-
-        // Add the palette colors
-        const paletteSize = 16; // colors.palette.length;
-        for (let c = 0; c < paletteSize; c++) add(`palette-${c}`, colors.palette[c]);
-
-        // TODO: consider honoring separate fonts for bold/italic and such in previews
-        // Add font settings
-        add("font-family", config.fontFamily.filter(Boolean).map(f => JSON.stringify(f)).join(", ") || JSON.stringify("JetBrainsMono Nerd Font"));
-        add("font-size", `${config.fontSize}px`);
-
-        return str;
-    });
+    //
+    // previewVars() owns the config -> CSS mapping (padding, opacity, ligatures, cell metrics, …)
+    // and `settings/previewCoverage.ts` names exactly the keys it reads.
+    const cssConfigVars = $derived(previewStyle(config, effectiveColors()));
 
     const {children}: {children: Snippet} = $props();
 
