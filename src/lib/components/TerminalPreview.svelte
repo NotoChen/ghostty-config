@@ -50,7 +50,7 @@
     let startTop = 0;
     let windowElement = $state<HTMLDivElement | null>(null);
     /** Has the initial spot been decided? It waits for a tick, so the config window can narrow first. */
-    let placed = false;
+    let placed = $state(false);
     /** Has the visitor set the window's size? A window they sized keeps it across viewport changes. */
     let userSized = false;
 
@@ -178,10 +178,15 @@
      * narrowed by `--preview-float-width`, and a measurement that lands before that style is
      * applied reports the old, wider window — which is how the terminal ended up 24px further right
      * than it should be. Two frames is what it takes for the narrowed layout to be measurable.
+     *
+     * `placed` flips at the end, not the start: it is what lifts the hidden-until-placed class, so
+     * flipping earlier would show the window at (0, 0) for the very frames this waits through.
      */
     function placeAfterLayout() {
         void tick().then(() => requestAnimationFrame(() => {
-            if (!isDocked) placeNextToConfig(viewportWidth, viewportHeight);
+            if (isDocked) return;
+            placeNextToConfig(viewportWidth, viewportHeight);
+            placed = true;
         }));
     }
 
@@ -190,7 +195,6 @@
     $effect(() => {
         if (isDocked || placed) return;
         untrack(() => {
-            placed = true;
             // Only a spot the visitor chose is restored. A spot we computed ourselves is
             // re-derived, because it was relative to a layout that may not exist any more.
             if (app.previewUserPlaced && app.previewX >= 0 && app.previewY >= 0) {
@@ -530,6 +534,7 @@
     class:docked={isDocked}
     class:floating={!isDocked}
     class:minimized={!isDocked && !app.previewVisible && !animating}
+    class:placing={!isDocked && !placed}
     class:docked-hidden={isDocked && !app.previewVisible}
     style:left={isDocked ? undefined : `${x}px`}
     style:top={isDocked ? undefined : `${y}px`}
@@ -777,6 +782,14 @@
 }
 
 .ghostty-window.floating.minimized {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* The first spot is measured two frames after mount (see placeAfterLayout), so without this the
+   window would paint once in the top-left corner before jumping to where it belongs. Hidden for
+   that one frame only — no transition, since it is never a state anyone should see. */
+.ghostty-window.floating.placing {
     opacity: 0;
     pointer-events: none;
 }
