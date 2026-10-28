@@ -80,17 +80,13 @@
         });
     });
 
-    // A viewport change moves the floating window with it. Deferred a tick so `.preview-floating`
-    // has re-laid-out before the config window is measured.
+    // A viewport change moves the floating window with it — the config window re-measures too, so
+    // this waits for the layout the same way the initial placement does.
     $effect(() => {
-        const vw = viewportWidth;
-        const vh = viewportHeight;
+        void viewportWidth;
+        void viewportHeight;
         if (isDocked || !placed) return;
-        untrack(() => {
-            void tick().then(() => {
-                if (!isDocked) placeNextToConfig(vw, vh);
-            });
-        });
+        untrack(() => placeAfterLayout());
     });
 
     // The config window narrows itself while the terminal is a separate window (see the
@@ -144,22 +140,14 @@
         };
     }
 
-    /** Would a window at `nextX`/`nextY` land on the config window? */
-    function coversConfigWindow(nextX: number, nextY: number): boolean {
-        const appRect = document.querySelector(".app-window")?.getBoundingClientRect();
-        if (!appRect) return false;
-        return nextX < appRect.right && nextX + width > appRect.left
-            && nextY < appRect.bottom && nextY + height > appRect.top;
-    }
-
     /**
-     * Put the window where it belongs for this viewport: on screen, and clear of the config window.
-     * A spot that still satisfies both is kept — it is the visitor's, or a default that still holds.
-     * One that doesn't is re-derived from the config window's current position.
+     * Put the window where it belongs for this viewport. A spot the visitor chose is theirs: it is
+     * only pulled back on screen. A spot we computed ourselves is re-derived from the config
+     * window's current position, because "24px to the right of it" stops being true as soon as the
+     * window it was measured against moves.
      */
     function position(vw: number, vh: number) {
-        const clamped = clampToViewport(x, y, vw, vh);
-        const spot = coversConfigWindow(clamped.x, clamped.y) ? defaultPlacement() : clamped;
+        const spot = app.previewUserPlaced ? clampToViewport(x, y, vw, vh) : defaultPlacement();
         if (spot.x === x && spot.y === y) return;
         x = spot.x;
         y = spot.y;
@@ -185,24 +173,31 @@
         position(vw, vh);
     }
 
-    // The initial spot is decided once, after the first layout: at mount the config window still
-    // owns the full width on the popped-out first render, so measuring then would put the terminal
-    // on top of it. `tick()` lets `.preview-floating` narrow it first.
+    /**
+     * Place once the layout has stopped moving. One `tick()` is not enough: the config window is
+     * narrowed by `--preview-float-width`, and a measurement that lands before that style is
+     * applied reports the old, wider window — which is how the terminal ended up 24px further right
+     * than it should be. Two frames is what it takes for the narrowed layout to be measurable.
+     */
+    function placeAfterLayout() {
+        void tick().then(() => requestAnimationFrame(() => {
+            if (!isDocked) placeNextToConfig(viewportWidth, viewportHeight);
+        }));
+    }
+
+    // The initial spot is decided once, after the first layout. At mount the config window still
+    // owns the full width, so measuring then would put the terminal on top of it.
     $effect(() => {
         if (isDocked || placed) return;
         untrack(() => {
-            void tick().then(() => {
-                if (isDocked || placed) return;
-                placed = true;
-
-                // Only a spot the visitor chose is restored. A spot we computed ourselves is
-                // re-derived, because it was relative to a layout that may not exist any more.
-                if (app.previewUserPlaced && app.previewX >= 0 && app.previewY >= 0) {
-                    x = app.previewX;
-                    y = app.previewY;
-                }
-                placeNextToConfig(viewportWidth, viewportHeight);
-            });
+            placed = true;
+            // Only a spot the visitor chose is restored. A spot we computed ourselves is
+            // re-derived, because it was relative to a layout that may not exist any more.
+            if (app.previewUserPlaced && app.previewX >= 0 && app.previewY >= 0) {
+                x = app.previewX;
+                y = app.previewY;
+            }
+            placeAfterLayout();
         });
     });
 
