@@ -38,6 +38,12 @@ function push(key: string, name: string, from: string, to: string) {
     // actually matters and pushes chips for other settings out of the list.
     const existing = recentChanges.find(change => change.key === key);
     if (existing) {
+        // Dragged back to where it started: nothing changed any more, so say nothing.
+        if (existing.from === to) {
+            remove(existing.id);
+            return;
+        }
+
         existing.name = name;
         existing.to = to;
         const timer = timers[existing.id];

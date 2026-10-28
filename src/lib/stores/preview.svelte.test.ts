@@ -47,6 +47,14 @@ describe("trackConfig()", () => {
         expect(recentChanges.map(change => change.key)).toEqual(["fontSize", "theme"]);
     });
 
+    it("withdraws the chip when a value is dragged back to where it started", () => {
+        trackConfig({fontSize: "18", theme: ""});
+        expect(recentChanges).toHaveLength(1);
+
+        trackConfig({fontSize: "13", theme: ""});
+        expect(recentChanges).toHaveLength(0);
+    });
+
     it("stays quiet for bulk changes", () => {
         trackConfig({a: "1", b: "1", c: "1", d: "1", e: "1"});
         expect(recentChanges).toHaveLength(0);
