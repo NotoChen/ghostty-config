@@ -16,10 +16,12 @@ export function parse(configString: string) {
     const lines = configString.split("\n");
 
 
-    const results = {
+    // Registry settings land on the flat string store; `palette` and `keybind` get their own shapes
+    // on top of it, so the index signature has to allow them explicitly.
+    const results: {palette: Array<HexColor | "">; keybind: KeybindString[]; [key: string]: string | string[]} = {
         palette: Array(256) as Array<HexColor | "">,
         keybind: [] as KeybindString[]
-    } as {palette: Array<HexColor | "">, keybind: KeybindString[], [key: string]: string | string[];};
+    };
 
     for (let p = 0; p < 256; p++) results.palette[p] = "";
 
