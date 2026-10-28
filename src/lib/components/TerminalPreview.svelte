@@ -45,20 +45,22 @@
     // The widest the docked pane may get at the current window size. Every way of changing the
     // width — dragging, the arrow keys, a width restored from last visit — goes through this, so a
     // narrow window can't end up with the settings column squeezed to nothing.
-    function dockWidthLimit(): number {
-        const parentWidth = windowElement?.parentElement?.getBoundingClientRect().width ?? window.innerWidth;
+    function dockWidthLimit(viewport: number): number {
+        const parentWidth = windowElement?.parentElement?.getBoundingClientRect().width ?? viewport;
         // ~420px is the sidebar plus a settings column that still fits a label and its control.
         return Math.max(MIN_PREVIEW_WIDTH, Math.min(MAX_PREVIEW_WIDTH, parentWidth - 420));
     }
 
     function setDockWidth(next: number) {
-        app.previewWidth = clampPreviewWidth(Math.min(dockWidthLimit(), next));
+        app.previewWidth = clampPreviewWidth(Math.min(dockWidthLimit(viewportWidth), next));
     }
 
     // A width remembered from a wider window (or from storage) is pulled back into that limit.
+    // `viewportWidth` is read here on purpose: `isDocked` stays true across a resize, so reading
+    // only the derived value would leave this effect dormant while the pane is still too wide.
     $effect(() => {
         if (!isDocked) return;
-        const limit = dockWidthLimit();
+        const limit = dockWidthLimit(viewportWidth);
         untrack(() => {
             if (app.previewWidth > limit) app.previewWidth = limit;
         });
