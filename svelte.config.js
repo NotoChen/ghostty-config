@@ -10,9 +10,8 @@ const config = {
         runes: true
     },
     kit: {
-        // adapter-auto only supports some environments, see https://kit.svelte.dev/docs/adapter-auto for a list.
-        // If your environment is not supported, or you settled on a specific environment, switch out the adapter.
-        // See https://kit.svelte.dev/docs/adapters for more information about adapters.
+        // Static hosting only — GitHub Pages, or any plain file server after `bun run build`.
+        // The fallback page is what makes a deep link like /app/local-config resolve instead of 404.
         adapter: adapter({
             fallback: "404.html"
         }),
