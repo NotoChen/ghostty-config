@@ -21,6 +21,18 @@
 
     const hasDiff = $derived(parsedDiff && Object.keys(parsedDiff).length > 0);
 
+    // Raw text keeps its own comments, so it is highlighted rather than dumped: the same three
+    // palette slots the structured branch uses (comment, key, value), which is what makes the
+    // file pane and the app pane readable side by side.
+    const assignment = /^(\s*)([a-zA-Z][\w-]*)(\s*=\s*)(.*)$/;
+
+    function classify(line: string): {kind: "comment" | "setting" | "plain"; indent?: string; key?: string; eq?: string; value?: string} {
+        if (line.trimStart().startsWith("#")) return {kind: "comment"};
+        const match = assignment.exec(line);
+        if (!match) return {kind: "plain"};
+        return {kind: "setting", indent: match[1], key: match[2], eq: match[3], value: match[4]};
+    }
+
     type Row =
         | {kind: "text"; text: string}
         | {kind: "setting"; key: string; value: string | string[]};
@@ -88,7 +100,14 @@
             <div class="row">&nbsp;</div>
         {/if}
         {#each (text ?? "").split("\n") as line, i (i)}
-            <div class="row">{line}</div>
+            {@const c = classify(line)}
+            {#if c.kind === "comment"}
+                <div class="row p2">{line}</div>
+            {:else if c.kind === "setting"}
+                <div class="row">{c.indent}<span class="p4">{c.key}</span>{c.eq}<span class="p5">{c.value}</span></div>
+            {:else}
+                <div class="row">{line}</div>
+            {/if}
         {/each}
     {/if}
 </div>

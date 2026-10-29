@@ -1,5 +1,5 @@
 import {afterEach, describe, expect, it} from "vitest";
-import config, {defaults, diff, diffFromDefaults, isNonDefault, load, resetSetting} from "./config.svelte";
+import config, {defaults, diff, diffFromDefaults, isNonDefault, load, loadReplacing, resetSetting} from "./config.svelte";
 import {serialize} from "#lib/utils/parse";
 
 // These lock in the flat-string store contract: every value is a string | string[], and
@@ -84,6 +84,27 @@ describe("load()", () => {
         load({fontSize: "20", background: "#123456"});
         expect(config.fontSize).toBe("20");
         expect(config.background).toBe("#123456");
+    });
+});
+
+describe("loadReplacing()", () => {
+    it("replaces rather than appending repeatables", () => {
+        config.keybind = [...defaults.keybind, "ctrl+shift+x=copy_to_clipboard"];
+        loadReplacing({keybind: ["ctrl+shift+y=copy_to_clipboard"]});
+        expect(config.keybind).toEqual(["ctrl+shift+y=copy_to_clipboard"]);
+    });
+
+    // `parse()` fills all 256 slots, leaving every one the file doesn't set as "". Writing those
+    // blanks through makes each slot read as non-default, and effectiveColors() then resolves
+    // every palette entry to nothing — the preview loses its colors entirely.
+    it("keeps the default color in palette slots the file leaves blank", () => {
+        const parsed = Array.from({length: 256}, () => "");
+        parsed[2] = "#ff0000";
+        loadReplacing({palette: parsed});
+
+        expect(config.palette[2]).toBe("#ff0000");
+        expect(config.palette[0]).toBe(defaults.palette[0]);
+        expect(diff().palette).toEqual(["2=#ff0000"]);
     });
 });
 

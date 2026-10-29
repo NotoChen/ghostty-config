@@ -521,21 +521,36 @@
 .compare {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    /* Four shared rows — heading, note, terminal sample, config preview — so a note that wraps
+       to a second line on one side can't push that column's terminal and preview out of line
+       with the other's. */
+    grid-template-rows: auto auto auto 1fr;
+    column-gap: 16px;
+    row-gap: 8px;
     margin: 16px 0;
 }
 
-@media (max-width: 900px) {
-    .compare {
-        grid-template-columns: 1fr;
-    }
+/* Both panes are subgrids over those four rows, so the rows stay in step; the row gap comes
+   from the parent grid. */
+.pane {
+    display: grid;
+    grid-row: span 4;
+    grid-template-rows: subgrid;
+    min-width: 0;
 }
 
-.pane {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    min-width: 0;
+@media (max-width: 900px) {
+    /* Stacked: the panes no longer share rows, so each is a plain column of its own again. */
+    .compare {
+        grid-template-columns: 1fr;
+        grid-template-rows: none;
+    }
+
+    .pane {
+        grid-row: auto;
+        grid-template-rows: none;
+        row-gap: 8px;
+    }
 }
 
 .pane h3 {

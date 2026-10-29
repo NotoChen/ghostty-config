@@ -85,6 +85,15 @@ export function loadReplacing(conf: Partial<SettingValues>) {
         const settingId = key as keyof SettingValues;
         const value = conf[settingId];
         if (value === undefined) continue;
+        // A parsed file carries all 256 palette slots, every untouched one as "". Blank means
+        // "this file doesn't set the slot", not "override it with nothing": writing the blanks
+        // through makes every slot read as non-default, and effectiveColors then resolves each
+        // one to nothing — which blanks the preview palette globally. Fall back to the default.
+        if (settingId === "palette") {
+            const source = value as string[];
+            setSetting("palette", defaults.palette.map((fallback, i) => source[i] || fallback));
+            continue;
+        }
         setSetting(settingId, value);
     }
 }
