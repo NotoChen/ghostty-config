@@ -106,7 +106,10 @@
             {:else if c.kind === "setting"}
                 <div class="row">{c.indent}<span class="p4">{c.key}</span>{c.eq}<span class="p5">{c.value}</span></div>
             {:else}
-                <div class="row">{line}</div>
+                <!-- A blank line still has to occupy a line box: an empty block is 0px tall, which
+                     silently swallows the file's blank lines and pulls this pane out of step with
+                     the structured one (which already renders empty rows as an nbsp). -->
+                <div class="row">{line || " "}</div>
             {/if}
         {/each}
     {/if}
