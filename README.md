@@ -166,5 +166,6 @@ GitHub Pages 的项目站点在 `https://<用户名>.github.io/<仓库名>/` 下
 - 原始项目：[zerebos/ghostty-config](https://github.com/zerebos/ghostty-config)，作者 [@Zerebos](https://github.com/zerebos)。本仓库保留其版权声明。
 - 主题数据来自 [iTerm2-Color-Schemes](https://github.com/mbadolato/iTerm2-Color-Schemes/)。
 - 感谢 [Ghostty](https://ghostty.org/) 以及它的作者 Mitchell Hashimoto。
+- 感谢 [Linux Do](https://linux.do/) 社区
 
 如果这个工具对你有用，欢迎给[原项目](https://github.com/zerebos/ghostty-config)点个 Star。
