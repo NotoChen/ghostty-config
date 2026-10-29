@@ -1,5 +1,5 @@
-import type {KeybindString} from "$lib/settings/types";
-import {registry} from "$lib/settings/registry";
+import type {KeybindString} from "#lib/settings/types";
+import {registry} from "#lib/settings/registry";
 import type {HexColor} from "./colors";
 
 const re = /^\s*([a-z-]+)[\s]*=\s*(.*)\s*$/;

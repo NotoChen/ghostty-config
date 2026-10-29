@@ -1,23 +1,23 @@
 <script lang="ts">
-    import Group from "$lib/components/settings/Group.svelte";
-    import Item from "$lib/components/settings/Item.svelte";
-    import Separator from "$lib/components/settings/Separator.svelte";
-    import {diff} from "$lib/stores/config.svelte";
-    // import {alert as showAlert} from "$lib/stores/modals.svelte";
-    import {annotatedConfigText} from "$lib/utils/configComments";
-    import {serialize} from "$lib/utils/parse";
-    import {buildShareUrl, encodeConfig, MAX_SHARE_URL_LENGTH} from "$lib/utils/share";
-    import Page from "$lib/views/Page.svelte";
-    import Button from "$lib/components/Button.svelte";
-    import ShareComposerModal from "$lib/components/modals/ShareComposerModal.svelte";
+    import Group from "#lib/components/settings/Group.svelte";
+    import Item from "#lib/components/settings/Item.svelte";
+    import Separator from "#lib/components/settings/Separator.svelte";
+    import {diff} from "#lib/stores/config.svelte";
+    // import {alert as showAlert} from "#lib/stores/modals.svelte";
+    import {annotatedConfigText} from "#lib/utils/configComments";
+    import {serialize} from "#lib/utils/parse";
+    import {buildShareUrl, encodeConfig, MAX_SHARE_URL_LENGTH} from "#lib/utils/share";
+    import Page from "#lib/views/Page.svelte";
+    import Button from "#lib/components/Button.svelte";
+    import ShareComposerModal from "#lib/components/modals/ShareComposerModal.svelte";
     import {onMount} from "svelte";
-    import {error, success} from "$lib/stores/toasts.svelte";
-    import {debounce, withPendingGuard} from "$lib/utils/debounce";
-    import {applyIncomingImport, checkHashForShare, checkTextForImport, dismissIncomingImport, getSourceInfo, incomingImport} from "$lib/stores/import.svelte";
-    import ConfigPreviewModal from "$lib/components/modals/ConfigPreviewModal.svelte";
-    import ShareIcon from "$lib/components/icons/ShareIcon.svelte";
-    import ImportIcon from "$lib/components/icons/ImportIcon.svelte";
-    import ConfigPreview from "$lib/components/ConfigPreview.svelte";
+    import {error, success} from "#lib/stores/toasts.svelte";
+    import {debounce, withPendingGuard} from "#lib/utils/debounce";
+    import {applyIncomingImport, checkHashForShare, checkTextForImport, dismissIncomingImport, getSourceInfo, incomingImport} from "#lib/stores/import.svelte";
+    import ConfigPreviewModal from "#lib/components/modals/ConfigPreviewModal.svelte";
+    import ShareIcon from "#lib/components/icons/ShareIcon.svelte";
+    import ImportIcon from "#lib/components/icons/ImportIcon.svelte";
+    import ConfigPreview from "#lib/components/ConfigPreview.svelte";
 
     // Handling for share urls
     onMount(() => {

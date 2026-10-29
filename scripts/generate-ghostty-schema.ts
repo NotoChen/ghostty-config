@@ -120,7 +120,6 @@ function mapZigType(zigType: string): string {
  * Extracts all `pub const EnumName = enum { ... }` definitions from the source.
  * Returns a map of EnumName → string[].
  */
-/* eslint-disable */
 function parseEnums(src: string): Map<string, string[]> {
     const enums = new Map<string, string[]>();
 
@@ -164,7 +163,6 @@ function parseEnums(src: string): Map<string, string[]> {
 
     return enums;
 }
-/* eslint-enable */
 
 // ---------------------------------------------------------------------------
 // Parse field definitions from the Config struct body

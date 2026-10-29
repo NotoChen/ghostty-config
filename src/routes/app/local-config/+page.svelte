@@ -1,23 +1,23 @@
 <script lang="ts">
     import {onMount} from "svelte";
     import {resolve} from "$app/paths";
-    import Page from "$lib/views/Page.svelte";
-    import Admonition from "$lib/components/Admonition.svelte";
-    import Button from "$lib/components/Button.svelte";
-    import ConfigPreview from "$lib/components/ConfigPreview.svelte";
-    import TerminalSample from "$lib/components/TerminalSample.svelte";
-    import DialogModal from "$lib/components/modals/DialogModal.svelte";
-    import Group from "$lib/components/settings/Group.svelte";
-    import Item from "$lib/components/settings/Item.svelte";
-    import Separator from "$lib/components/settings/Separator.svelte";
-    import config, {defaults, diff, loadReplacing, resetAll} from "$lib/stores/config.svelte";
-    import {attachLocalConfig, detachLocalConfig, localConfig, parsedLocalConfig, refreshLocalConfig, writeLocalConfig} from "$lib/stores/localConfig.svelte";
-    import {preview, effectiveColors} from "$lib/stores/theme.svelte";
-    import {success, error} from "$lib/stores/toasts.svelte";
-    import {annotatedConfigText, configAnnotations} from "$lib/utils/configComments";
-    import {diffConfigs, lineDiff, mergeConfigText, summarizeDiff} from "$lib/utils/configDiff";
-    import {colorsToStyle, configVarsStyle, type ConfigColorSource} from "$lib/utils/configVars";
-    import {serialize} from "$lib/utils/parse";
+    import Page from "#lib/views/Page.svelte";
+    import Admonition from "#lib/components/Admonition.svelte";
+    import Button from "#lib/components/Button.svelte";
+    import ConfigPreview from "#lib/components/ConfigPreview.svelte";
+    import TerminalSample from "#lib/components/TerminalSample.svelte";
+    import DialogModal from "#lib/components/modals/DialogModal.svelte";
+    import Group from "#lib/components/settings/Group.svelte";
+    import Item from "#lib/components/settings/Item.svelte";
+    import Separator from "#lib/components/settings/Separator.svelte";
+    import config, {defaults, diff, loadReplacing, resetAll} from "#lib/stores/config.svelte";
+    import {attachLocalConfig, detachLocalConfig, localConfig, parsedLocalConfig, refreshLocalConfig, writeLocalConfig} from "#lib/stores/localConfig.svelte";
+    import {preview, effectiveColors} from "#lib/stores/theme.svelte";
+    import {success, error} from "#lib/stores/toasts.svelte";
+    import {annotatedConfigText, configAnnotations} from "#lib/utils/configComments";
+    import {diffConfigs, lineDiff, mergeConfigText, summarizeDiff} from "#lib/utils/configDiff";
+    import {colorsToStyle, configVarsStyle, type ConfigColorSource} from "#lib/utils/configVars";
+    import {serialize} from "#lib/utils/parse";
 
     type Value = string | string[];
 

@@ -102,7 +102,9 @@
 body {
     min-height: 100vh;
     margin: 0;
-	background-image: url("$lib/images/monterey.webp");
+	/* Relative, not `#lib/…`: Vite resolves CSS `url()` against the file, but does not follow
+	   package.json `imports` here, which would leave a literal, unemitted path in the bundle. */
+	background-image: url("./lib/images/monterey.webp");
 	background-attachment: fixed;
 	background-size: cover;
 	background-position: center center;

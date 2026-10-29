@@ -1,6 +1,6 @@
 <script lang="ts">
-    import {parseTheme} from "$lib/settings/codecs";
-    import {preview, type PreviewMode} from "$lib/stores/theme.svelte";
+    import {parseTheme} from "#lib/settings/codecs";
+    import {preview, type PreviewMode} from "#lib/stores/theme.svelte";
     import DualTheme from "./DualTheme.svelte";
     import PillButtons from "./PillButtons.svelte";
 

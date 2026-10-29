@@ -1,6 +1,6 @@
 <script lang="ts">
-    import type {PreviewState} from "$lib/stores/import.svelte";
-    import {configAnnotations, sectionHeader} from "$lib/utils/configComments";
+    import type {PreviewState} from "#lib/stores/import.svelte";
+    import {configAnnotations, sectionHeader} from "#lib/utils/configComments";
 
     interface Props {
         parsed?: boolean | PreviewState["parsed"];

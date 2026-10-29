@@ -1,10 +1,10 @@
 import type {Component} from "svelte";
 
-import type {PreviewKey} from "$lib/settings/types";
-import AppIconPreview from "$lib/views/AppIconPreview.svelte";
-import BaseColorPreview from "$lib/views/BaseColorPreview.svelte";
-import CursorPreview from "$lib/views/CursorPreview.svelte";
-import PalettePreview from "$lib/views/PalettePreview.svelte";
+import type {PreviewKey} from "#lib/settings/types";
+import AppIconPreview from "#lib/views/AppIconPreview.svelte";
+import BaseColorPreview from "#lib/views/BaseColorPreview.svelte";
+import CursorPreview from "#lib/views/CursorPreview.svelte";
+import PalettePreview from "#lib/views/PalettePreview.svelte";
 
 // Renderer-side map: nav group `preview` key -> the component rendered above that group's
 // settings. Kept out of navigation.ts so the nav tree stays pure data (no `.svelte` imports).

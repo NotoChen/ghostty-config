@@ -1,6 +1,6 @@
-import {dev} from "$app/environment";
-import {registry, type SettingDefaults, type SettingValues} from "$lib/settings/registry";
-import {runInitializers} from "$lib/settings/initializers";
+import {dev} from "$app/env";
+import {registry, type SettingDefaults, type SettingValues} from "#lib/settings/registry";
+import {runInitializers} from "#lib/settings/initializers";
 
 
 // Run initializers before setting up defaults to ensure that any dynamic options are populated

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {toRoot} from "$lib/attachments/portal";
+    import {toRoot} from "#lib/attachments/portal";
     import {fly, scale} from "svelte/transition";
 
     type DropdownOptionInput =

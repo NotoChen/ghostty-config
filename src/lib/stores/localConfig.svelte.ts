@@ -1,4 +1,4 @@
-import {parse} from "$lib/utils/parse";
+import {parse} from "#lib/utils/parse";
 
 // Client half of the local-config bridge (see scripts/vite-plugin-local-config.ts). The endpoint
 // only exists under `vite dev` / `vite preview`; when it answers 404 or the fetch fails, the page

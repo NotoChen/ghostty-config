@@ -1,8 +1,8 @@
 <script lang="ts">
-    import Page from "$lib/views/Page.svelte";
-    import logo from "$lib/images/icon.webp";
-    import Admonition from "$lib/components/Admonition.svelte";
-    import {GHOSTTY_VERSION} from "$lib/data/version";
+    import Page from "#lib/views/Page.svelte";
+    import logo from "#lib/images/icon.webp";
+    import Admonition from "#lib/components/Admonition.svelte";
+    import {GHOSTTY_VERSION} from "#lib/data/version";
 </script>
 
 <Page title="Ghostty Config">

@@ -1,6 +1,6 @@
 <script lang="ts">
-    import {countDecimalPlaces} from "$lib/utils/numbers";
-    import {numberCodec} from "$lib/settings/codecs";
+    import {countDecimalPlaces} from "#lib/utils/numbers";
+    import {numberCodec} from "#lib/settings/codecs";
 
     type Props = {
         value: string; // flat-store string; parsed to a number internally via numberCodec

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import config from "$lib/stores/config.svelte";
+    import config from "#lib/stores/config.svelte";
     import {onMount} from "svelte";
 
     let isCursorVisible = $state(true);

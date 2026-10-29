@@ -1,15 +1,15 @@
 <script lang="ts">
     import KeybindEditor from "./KeybindEditor.svelte";
     import Text from "./Text.svelte";
-    import settings from "$lib/settings/registry";
-    import {confirm} from "$lib/stores/modals.svelte";
-    import {describeAction, formatTrigger, getDiagnostics, parseTrigger, splitKeybind} from "$lib/utils/keybinds";
-    import {stepFromEvent, triggerCaps, type TriggerCaps} from "$lib/utils/keycaps";
-    import {defaultKeybindSource, modifierLabel} from "$lib/utils/platform";
-    import icon from "$lib/images/tabs/keybinds.webp";
+    import settings from "#lib/settings/registry";
+    import {confirm} from "#lib/stores/modals.svelte";
+    import {describeAction, formatTrigger, getDiagnostics, parseTrigger, splitKeybind} from "#lib/utils/keybinds";
+    import {stepFromEvent, triggerCaps, type TriggerCaps} from "#lib/utils/keycaps";
+    import {defaultKeybindSource, modifierLabel} from "#lib/utils/platform";
+    import icon from "#lib/images/tabs/keybinds.webp";
     import {fly} from "svelte/transition";
     import Admonition from "../Admonition.svelte";
-    import {success} from "$lib/stores/toasts.svelte";
+    import {success} from "#lib/stores/toasts.svelte";
 
     let selected: number[] = $state([]);
     let {value = $bindable([])}: {value: string[]} = $props();

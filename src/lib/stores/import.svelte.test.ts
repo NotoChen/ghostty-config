@@ -10,25 +10,25 @@ import {afterEach, describe, expect, it, vi} from "vitest";
 // config.svelte's `load` is wrapped in a spy over the REAL implementation, so the store still
 // mutates for real — we can both assert it ran and force it to throw for one test.
 
-vi.mock("$lib/stores/toasts.svelte", async (importOriginal) => {
-    const actual = await importOriginal<typeof import("$lib/stores/toasts.svelte")>();
+vi.mock("#lib/stores/toasts.svelte", async (importOriginal) => {
+    const actual = await importOriginal<typeof import("#lib/stores/toasts.svelte")>();
     return {...actual, success: vi.fn(), error: vi.fn()};
 });
 
-vi.mock("$lib/stores/modals.svelte", async (importOriginal) => {
-    const actual = await importOriginal<typeof import("$lib/stores/modals.svelte")>();
+vi.mock("#lib/stores/modals.svelte", async (importOriginal) => {
+    const actual = await importOriginal<typeof import("#lib/stores/modals.svelte")>();
     return {...actual, alert: vi.fn(() => Promise.resolve())};
 });
 
-vi.mock("$lib/stores/config.svelte", async (importOriginal) => {
-    const actual = await importOriginal<typeof import("$lib/stores/config.svelte")>();
+vi.mock("#lib/stores/config.svelte", async (importOriginal) => {
+    const actual = await importOriginal<typeof import("#lib/stores/config.svelte")>();
     return {...actual, load: vi.fn(actual.load)};
 });
 
-import config, {diffFromDefaults, load, resetSetting} from "$lib/stores/config.svelte";
-import {alert as showAlert} from "$lib/stores/modals.svelte";
-import {error, success} from "$lib/stores/toasts.svelte";
-import {encodeConfig, SHARE_HASH_KEY} from "$lib/utils/share";
+import config, {diffFromDefaults, load, resetSetting} from "#lib/stores/config.svelte";
+import {alert as showAlert} from "#lib/stores/modals.svelte";
+import {error, success} from "#lib/stores/toasts.svelte";
+import {encodeConfig, SHARE_HASH_KEY} from "#lib/utils/share";
 import {applyIncomingImport, checkHashForShare, checkTextForImport, dismissIncomingImport, getSourceInfo, incomingImport} from "./import.svelte";
 
 afterEach(() => {

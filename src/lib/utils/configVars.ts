@@ -1,5 +1,5 @@
-import themes from "$lib/data/themes";
-import {parseTheme} from "$lib/settings/codecs";
+import themes from "#lib/data/themes";
+import {parseTheme} from "#lib/settings/codecs";
 import {resolveCellColor, type ColorScheme} from "./colors";
 
 // Turns an arbitrary config object into the `--config-*` CSS custom properties the previews

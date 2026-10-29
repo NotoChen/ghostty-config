@@ -1,13 +1,13 @@
 <script lang="ts">
     import {marked} from "marked";
-    import AlertModal from "$lib/components/modals/AlertModal.svelte";
-    import Button from "$lib/components/Button.svelte";
+    import AlertModal from "#lib/components/modals/AlertModal.svelte";
+    import Button from "#lib/components/Button.svelte";
     import {
         dismissTopModal,
         getTopModal,
         resolveTopAlert,
         resolveTopConfirm
-    } from "$lib/stores/modals.svelte";
+    } from "#lib/stores/modals.svelte";
 
     const activeModal = $derived(getTopModal());
 

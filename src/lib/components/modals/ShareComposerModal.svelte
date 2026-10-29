@@ -1,10 +1,10 @@
 <script lang="ts">
     import {onMount} from "svelte";
-    import ShareIcon from "$lib/components/icons/ShareIcon.svelte";
-    import DialogModal from "$lib/components/modals/DialogModal.svelte";
-    import Button from "$lib/components/Button.svelte";
-    import {error, success} from "$lib/stores/toasts.svelte";
-    import {debounce} from "$lib/utils/debounce";
+    import ShareIcon from "#lib/components/icons/ShareIcon.svelte";
+    import DialogModal from "#lib/components/modals/DialogModal.svelte";
+    import Button from "#lib/components/Button.svelte";
+    import {error, success} from "#lib/stores/toasts.svelte";
+    import {debounce} from "#lib/utils/debounce";
 
 
     // Prereq

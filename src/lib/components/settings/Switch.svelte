@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {boolCodec} from "$lib/settings/codecs";
+    import {boolCodec} from "#lib/settings/codecs";
 
     interface Props {
         disabled?: boolean;

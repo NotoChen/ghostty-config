@@ -1,6 +1,6 @@
-import {frameUrls, iconUrls} from "$lib/data/macicons";
-import themes from "$lib/data/themes";
-import {themeIcon} from "$lib/utils/themes";
+import {frameUrls, iconUrls} from "#lib/data/macicons";
+import themes from "#lib/data/themes";
+import {themeIcon} from "#lib/utils/themes";
 
 import type {DropdownOption} from "./types";
 

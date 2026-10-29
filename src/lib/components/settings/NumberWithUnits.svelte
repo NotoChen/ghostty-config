@@ -10,7 +10,7 @@
      * optional "units" feature, since it's basically just a number input with some
      * extra parsing and a pill button group attached.
      */
-    import {numberCodec, numberUnitsCodec, type NumberUnit} from "$lib/settings/codecs";
+    import {numberCodec, numberUnitsCodec, type NumberUnit} from "#lib/settings/codecs";
     import PillButtonGroup from "./PillButtons.svelte";
     import Number from "./Number.svelte";
 

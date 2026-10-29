@@ -1,7 +1,7 @@
 <script lang="ts">
-    import app from "$lib/stores/state.svelte";
+    import app from "#lib/stores/state.svelte";
 
-    import appIcon from "$lib/images/icon.webp";
+    import appIcon from "#lib/images/icon.webp";
     import GhosttyIcon from "./GhosttyIcon.svelte";
 
     function activateTerminal() {

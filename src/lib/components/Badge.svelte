@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {createTooltipAttachment} from "$lib/attachments/tooltip";
+    import {createTooltipAttachment} from "#lib/attachments/tooltip";
 
     interface Props {
         type: "platform" | "version" | "theme" | "preview";

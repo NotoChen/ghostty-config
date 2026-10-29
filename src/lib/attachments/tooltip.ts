@@ -1,6 +1,6 @@
 import type {Attachment} from "svelte/attachments";
 import {mount, unmount} from "svelte";
-import Tooltip from "$lib/components/Tooltip.svelte";
+import Tooltip from "#lib/components/Tooltip.svelte";
 
 type TooltipText = string | (() => string);
 

@@ -1,5 +1,5 @@
-import {numberCodec} from "$lib/settings/codecs";
-import {resolveCellColor} from "$lib/utils/colors";
+import {numberCodec} from "#lib/settings/codecs";
+import {resolveCellColor} from "#lib/utils/colors";
 
 // Turns the parts of a Ghostty config that a browser *can* reproduce into `--config-*` CSS vars.
 // This is the whole preview-fidelity budget in one place: anything listed in `PreviewConfig` and

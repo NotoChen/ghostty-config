@@ -10,7 +10,7 @@
  *
  * Unlike themes, there's no "discover everything" step here, the set of
  * icons/frames/layers we care about is the fixed set already referenced in
- * $lib/data/macicons.ts (iconUrls, frameUrls, customLayerUrls). Each entry
+ * #lib/data/macicons.ts (iconUrls, frameUrls, customLayerUrls). Each entry
  * maps to a known `.imageset` folder. Xcode asset catalogs wrap the actual
  * PNG inside that folder alongside a Contents.json describing it, and the
  * real filename isn't guaranteed to match any naming convention, so we read
@@ -161,7 +161,7 @@ function resolveImagesetFile(imagesetDir: string): string {
 
 /**
  * Renders the macicon.ts module using Vite-imported PNGs rather than plain
- * URL strings. Each asset becomes a named import from $lib/images/vendor/,
+ * URL strings. Each asset becomes a named import from #lib/images/vendor/,
  * Vite processes it at build time (content-hashed filename, cache-busting on
  * change), and the three record exports use shorthand property syntax with
  * `as const satisfies` so keys are narrowly typed and usable for autocomplete.
@@ -175,7 +175,7 @@ export function renderModule(entries: AssetEntry[], localFileByKey: Record<strin
 
     // One import per asset, using the key as the local identifier.
     for (const entry of entries) {
-        lines.push(`import ${entry.key} from "$lib/images/vendor/${localFileByKey[entry.key]}";`);
+        lines.push(`import ${entry.key} from "#lib/images/vendor/${localFileByKey[entry.key]}";`);
     }
 
     const byRecord: Record<AssetEntry["record"], AssetEntry[]> = {

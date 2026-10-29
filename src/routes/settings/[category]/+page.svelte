@@ -1,43 +1,43 @@
 <script lang="ts">
-    import Page from "$lib/views/Page.svelte";
+    import Page from "#lib/views/Page.svelte";
 
-    import {page} from "$app/stores";
-    import Switch from "$lib/components/settings/Switch.svelte";
-    import Item from "$lib/components/settings/Item.svelte";
-    import Group from "$lib/components/settings/Group.svelte";
-    import Separator from "$lib/components/settings/Separator.svelte";
+    import {page} from "$app/state";
+    import Switch from "#lib/components/settings/Switch.svelte";
+    import Item from "#lib/components/settings/Item.svelte";
+    import Group from "#lib/components/settings/Group.svelte";
+    import Separator from "#lib/components/settings/Separator.svelte";
 
-    import registry from "$lib/settings/registry";
-    import navigation from "$lib/settings/navigation";
-    import config, {isNonDefault, resetSetting, setSetting} from "$lib/stores/config.svelte";
-    import {activeThemeName, colorTier, effectiveColors, isSchemeColorKey, paletteTier, themeSelection} from "$lib/stores/theme.svelte";
-    import Text from "$lib/components/settings/Text.svelte";
-    import Number from "$lib/components/settings/Number.svelte";
-    import Dropdown from "$lib/components/settings/Dropdown.svelte";
-    import Color from "$lib/components/settings/Color.svelte";
-    import Palette from "$lib/components/settings/Palette.svelte";
-    import Admonition from "$lib/components/Admonition.svelte";
-    import Theme from "$lib/components/settings/Theme.svelte";
+    import registry from "#lib/settings/registry";
+    import navigation from "#lib/settings/navigation";
+    import config, {isNonDefault, resetSetting, setSetting} from "#lib/stores/config.svelte";
+    import {activeThemeName, colorTier, effectiveColors, isSchemeColorKey, paletteTier, themeSelection} from "#lib/stores/theme.svelte";
+    import Text from "#lib/components/settings/Text.svelte";
+    import Number from "#lib/components/settings/Number.svelte";
+    import Dropdown from "#lib/components/settings/Dropdown.svelte";
+    import Color from "#lib/components/settings/Color.svelte";
+    import Palette from "#lib/components/settings/Palette.svelte";
+    import Admonition from "#lib/components/Admonition.svelte";
+    import Theme from "#lib/components/settings/Theme.svelte";
     import {previews} from "./previews";
     import type {Component} from "svelte";
-    import type {HexColor} from "$lib/utils/colors";
+    import type {HexColor} from "#lib/utils/colors";
     import {resolve} from "$app/paths";
-    import {success} from "$lib/stores/toasts.svelte";
-    import Range from "$lib/components/settings/Range.svelte";
-    import RepeatableText from "$lib/components/settings/RepeatableText.svelte";
-    import FeatureList from "$lib/components/settings/FeatureList.svelte";
-    import PillButtons from "$lib/components/settings/PillButtons.svelte";
-    import Duration from "$lib/components/settings/Duration.svelte";
-    import DualNumber from "$lib/components/settings/DualNumber.svelte";
-    import CustomColor from "$lib/components/settings/CustomColor.svelte";
-    import CustomNumber from "$lib/components/settings/CustomNumber.svelte";
-    import ScrollMultiplier from "$lib/components/settings/ScrollMultiplier.svelte";
-    import NumberWithUnits from "$lib/components/settings/NumberWithUnits.svelte";
-    import {type DropdownOption, type FeatureDef, type PillOption, type SettingsRegistry, type SpecialValue} from "$lib/settings/types";
-    import {isPreviewed, previewCoverage} from "$lib/settings/previewCoverage";
+    import {success} from "#lib/stores/toasts.svelte";
+    import Range from "#lib/components/settings/Range.svelte";
+    import RepeatableText from "#lib/components/settings/RepeatableText.svelte";
+    import FeatureList from "#lib/components/settings/FeatureList.svelte";
+    import PillButtons from "#lib/components/settings/PillButtons.svelte";
+    import Duration from "#lib/components/settings/Duration.svelte";
+    import DualNumber from "#lib/components/settings/DualNumber.svelte";
+    import CustomColor from "#lib/components/settings/CustomColor.svelte";
+    import CustomNumber from "#lib/components/settings/CustomNumber.svelte";
+    import ScrollMultiplier from "#lib/components/settings/ScrollMultiplier.svelte";
+    import NumberWithUnits from "#lib/components/settings/NumberWithUnits.svelte";
+    import {type DropdownOption, type FeatureDef, type PillOption, type SettingsRegistry, type SpecialValue} from "#lib/settings/types";
+    import {isPreviewed, previewCoverage} from "#lib/settings/previewCoverage";
 
 
-    const {params} = $derived($page);
+    const params = $derived(page.params);
     const category = $derived(navigation.find(c => c.id === params.category));
     const title = $derived(category?.name ?? params.category);
 

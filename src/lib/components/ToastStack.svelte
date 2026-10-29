@@ -1,6 +1,6 @@
 <script lang="ts">
-    import Toast from "$lib/components/Toast.svelte";
-    import {getToasts} from "$lib/stores/toasts.svelte";
+    import Toast from "#lib/components/Toast.svelte";
+    import {getToasts} from "#lib/stores/toasts.svelte";
 
     const toasts = $derived(getToasts());
 </script>

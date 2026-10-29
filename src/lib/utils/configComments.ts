@@ -1,5 +1,5 @@
-import navigation from "$lib/settings/navigation";
-import {registry} from "$lib/settings/registry";
+import navigation from "#lib/settings/navigation";
+import {registry} from "#lib/settings/registry";
 import {CONFIG_HEADER, settingLines} from "./parse";
 import {clip, firstSentence} from "./plainText";
 

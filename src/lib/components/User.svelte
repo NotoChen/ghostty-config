@@ -1,14 +1,16 @@
 <script lang="ts">
     import {resolve} from "$app/paths";
     import {page} from "$app/state";
-    import type {Pathname} from "$app/types";
-    import logo from "$lib/images/avatar.webp";
+    import type {Path} from "$app/types";
+    import logo from "#lib/images/avatar.webp";
 
-    const {route = "/", name = "Ghostty Config"} = $props();
+    // SvelteKit 3 types `resolve` against the generated route union, so `route` is typed as `Path`
+    // rather than a bare string — it is only ever one of this app's own pages.
+    const {route = "", name = "Ghostty Config"}: {route?: Path; name?: string} = $props();
     const path = $derived(page.url.pathname);
 
     // `resolve` carries the deploy base, so compare against it rather than the bare route.
-    const href = $derived(resolve(route as Pathname));
+    const href = $derived(resolve(route));
     const selected = $derived(path === href);
 </script>
 

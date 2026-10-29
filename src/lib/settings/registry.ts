@@ -1,6 +1,6 @@
 import {macosIconFrameOptions, macosIconOptions, themeOptions} from "./options";
 import type {SettingInfo, SettingsRegistry} from "./types";
-import {dev} from "$app/environment";
+import {dev} from "$app/env";
 
 
 /* eslint quote-props: ["error", "consistent-as-needed", {"keywords": false}] */

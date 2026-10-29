@@ -1,11 +1,11 @@
 <script lang="ts">
     import {marked} from "marked";
     import {type Snippet} from "svelte";
-    import {createTooltipAttachment} from "$lib/attachments/tooltip";
-    import type {GhosttyPlatform} from "$lib/settings/types";
+    import {createTooltipAttachment} from "#lib/attachments/tooltip";
+    import type {GhosttyPlatform} from "#lib/settings/types";
     import Badge from "../Badge.svelte";
-    import {searchState} from "$lib/stores/search.svelte";
-    import {setSetting} from "$lib/contexts";
+    import {searchState} from "#lib/stores/search.svelte";
+    import {setSetting} from "#lib/contexts";
 
     interface Props {
         name?: string;

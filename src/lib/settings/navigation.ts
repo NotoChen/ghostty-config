@@ -1,21 +1,21 @@
-import application from "$lib/images/tabs/application.webp";
-import terminal from "$lib/images/tabs/terminal.webp"; // placeholder
-import clipboard from "$lib/images/tabs/clipboard.webp";
-import window from "$lib/images/tabs/window.webp";
+import application from "#lib/images/tabs/application.webp";
+import terminal from "#lib/images/tabs/terminal.webp"; // placeholder
+import clipboard from "#lib/images/tabs/clipboard.webp";
+import window from "#lib/images/tabs/window.webp";
 
-import colors from "$lib/images/tabs/colors.webp";
-import fonts from "$lib/images/tabs/fonts.webp";
+import colors from "#lib/images/tabs/colors.webp";
+import fonts from "#lib/images/tabs/fonts.webp";
 
-import keybinds from "$lib/images/tabs/keybinds.webp";
-import mouse from "$lib/images/tabs/mouse.webp";
+import keybinds from "#lib/images/tabs/keybinds.webp";
+import mouse from "#lib/images/tabs/mouse.webp";
 
-import gtk from "$lib/images/tabs/gtk.svg";
-import linux from "$lib/images/tabs/linux.webp";
-import macos from "$lib/images/tabs/macos.webp";
+import gtk from "#lib/images/tabs/gtk.svg";
+import linux from "#lib/images/tabs/linux.webp";
+import macos from "#lib/images/tabs/macos.webp";
 
 import {registry} from "./registry";
 import type {PreviewKey} from "./types";
-import {dev} from "$app/environment";
+import {dev} from "$app/env";
 
 /* eslint quote-props: ["error", "consistent-as-needed", {"keywords": false}] */
 

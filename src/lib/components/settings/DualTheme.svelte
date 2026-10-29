@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {dualThemeCodec, type LinkedValue} from "$lib/settings/codecs";
+    import {dualThemeCodec, type LinkedValue} from "#lib/settings/codecs";
     import Dropdown from "./Dropdown.svelte";
     import LinkedInput from "./LinkedInput.svelte";
 

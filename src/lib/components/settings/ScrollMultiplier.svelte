@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {scrollMultiplierCodec} from "$lib/settings/codecs";
+    import {scrollMultiplierCodec} from "#lib/settings/codecs";
     import DualNumber from "./DualNumber.svelte";
 
     interface Props { value: string; }

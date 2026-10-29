@@ -1,7 +1,7 @@
 <script lang="ts">
-    import {getSetting} from "$lib/contexts";
-    import {boolCodec, featureListCodec, type FeatureState} from "$lib/settings/codecs";
-    import type {FeatureDef} from "$lib/settings/types";
+    import {getSetting} from "#lib/contexts";
+    import {boolCodec, featureListCodec, type FeatureState} from "#lib/settings/codecs";
+    import type {FeatureDef} from "#lib/settings/types";
     import Button from "../Button.svelte";
     import CheckListIcon from "../icons/CheckListIcon.svelte";
     import DialogModal from "../modals/DialogModal.svelte";

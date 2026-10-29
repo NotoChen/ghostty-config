@@ -1,8 +1,8 @@
 <script lang="ts">
     import {onNavigate} from "$app/navigation";
     import {fly} from "svelte/transition";
-    import History from "$lib/components/History.svelte";
-    import app from "$lib/stores/state.svelte";
+    import History from "#lib/components/History.svelte";
+    import app from "#lib/stores/state.svelte";
     import type {Snippet} from "svelte";
 
     interface Props {

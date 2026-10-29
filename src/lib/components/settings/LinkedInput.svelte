@@ -1,6 +1,6 @@
 <script lang="ts">
     import type {Snippet} from "svelte";
-    import {tooltip} from "$lib/actions/tooltip.svelte";
+    import {tooltip} from "#lib/actions/tooltip.svelte";
 
     // The two sides plus whether they are kept in sync and serialized as one.
     // Consumers supply parse/serialize that match this shape structurally.

@@ -1,6 +1,6 @@
 <script lang="ts">
-    import {dismissToast} from "$lib/stores/toasts.svelte";
-    import {sequoiaEase} from "$lib/utils/animations";
+    import {dismissToast} from "#lib/stores/toasts.svelte";
+    import {sequoiaEase} from "#lib/utils/animations";
     import {fly} from "svelte/transition";
 
     interface Props {

@@ -1,7 +1,7 @@
 <script lang="ts">
-    import {relativeTooltip} from "$lib/actions/tooltip.svelte";
-    import {countDecimalPlaces} from "$lib/utils/numbers";
-    import {numberCodec} from "$lib/settings/codecs";
+    import {relativeTooltip} from "#lib/actions/tooltip.svelte";
+    import {countDecimalPlaces} from "#lib/utils/numbers";
+    import {numberCodec} from "#lib/settings/codecs";
 
     interface RangeProps {
         min: number;

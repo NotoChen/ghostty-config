@@ -1,6 +1,6 @@
 <script lang="ts">
-    import DialogModal from "$lib/components/modals/DialogModal.svelte";
-    import Button from "$lib/components/Button.svelte";
+    import DialogModal from "#lib/components/modals/DialogModal.svelte";
+    import Button from "#lib/components/Button.svelte";
     import type {Snippet} from "svelte";
     import ConfigPreview from "../ConfigPreview.svelte";
 

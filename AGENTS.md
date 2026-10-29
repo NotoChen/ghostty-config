@@ -6,7 +6,8 @@ Operating guide for automated agents working in this repository. Read this befor
 
 - **Runtime**: Bun ≥ 1.3 required. All commands run from the repo root.
 - **Module system**: `"type": "module"` ES imports only, no `require`.
-- **Framework**: Svelte 5 with runes. This is **not** Svelte 3/4. Do not use `writable`, `derived`, `readable`, or any legacy store primitives. See the Svelte 5 section below.
+- **Framework**: Svelte 5 with runes on SvelteKit 3. This is **not** Svelte 3/4. Do not use `writable`, `derived`, `readable`, or any legacy store primitives. See the Svelte 5 section below.
+- **Imports**: `#lib/…` (a `package.json` `imports` subpath), not the `$lib` alias — SvelteKit 3 removed it. CSS `url()` cannot follow it; use a relative path there.
 
 ## Required checks: run before marking anything ready
 
@@ -182,9 +183,9 @@ Rules that must stay true:
 
 ## Other conventions
 
-**Async handlers**: use `withPendingGuard(fn)` from `$lib/utils/debounce` for anything that must not fire concurrently. Use `debounce(fn, ms)` (leading-edge by default in this codebase) for rate-limiting sync actions.
+**Async handlers**: use `withPendingGuard(fn)` from `#lib/utils/debounce` for anything that must not fire concurrently. Use `debounce(fn, ms)` (leading-edge by default in this codebase) for rate-limiting sync actions.
 
-**User feedback**: use the toast system (`success()` / `error()` from `$lib/stores/toasts.svelte`) for all success/failure feedback. Do not introduce inline button label swapping or other ad-hoc feedback patterns.
+**User feedback**: use the toast system (`success()` / `error()` from `#lib/stores/toasts.svelte`) for all success/failure feedback. Do not introduce inline button label swapping or other ad-hoc feedback patterns.
 
 **Serialization**: only values differing from defaults appear in the generated config output. `diff()` handles this, do not add serialization logic elsewhere.
 
@@ -202,7 +203,7 @@ The `""`-means-genuinely-unset rule is **load-bearing**, not just style: the set
 - Double quotes for strings, semicolons everywhere
 - `brace-style: stroustrup` (braces on multi-line blocks, allowed to omit for single-line)
 - `import type` when only types are needed
-- Grouped imports: external → `$lib` → relative, alphabetical within each group
+- Grouped imports: external → `#lib` → relative, alphabetical within each group
 - `class:foo={condition}` not manual class string concatenation
 
 ## AI self-disclosure

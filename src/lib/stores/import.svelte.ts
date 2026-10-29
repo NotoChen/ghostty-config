@@ -1,8 +1,8 @@
-import {parse} from "$lib/utils/parse";
-import {diffFromDefaults, load} from "$lib/stores/config.svelte";
-import {decodeConfig, getSharePayloadFromHash, removeSharePayloadFromHash} from "$lib/utils/share";
-import {error, success} from "$lib/stores/toasts.svelte";
-import {alert as showAlert} from "$lib/stores/modals.svelte";
+import {parse} from "#lib/utils/parse";
+import {diffFromDefaults, load} from "#lib/stores/config.svelte";
+import {decodeConfig, getSharePayloadFromHash, removeSharePayloadFromHash} from "#lib/utils/share";
+import {error, success} from "#lib/stores/toasts.svelte";
+import {alert as showAlert} from "#lib/stores/modals.svelte";
 
 export type ImportSource = "share" | "clipboard" | "file";
 

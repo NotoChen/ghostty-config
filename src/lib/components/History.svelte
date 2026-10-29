@@ -1,6 +1,6 @@
 <script lang="ts">
     import {onNavigate} from "$app/navigation";
-    import {processNavigation, canGoBack, canGoForward} from "$lib/stores/history.svelte";
+    import {processNavigation, canGoBack, canGoForward} from "#lib/stores/history.svelte";
 
 
     onNavigate(processNavigation);

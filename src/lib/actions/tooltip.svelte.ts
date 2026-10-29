@@ -1,6 +1,6 @@
 import {mount, unmount} from "svelte";
 import type {Action} from "svelte/action";
-import Tooltip from "$lib/components/Tooltip.svelte";
+import Tooltip from "#lib/components/Tooltip.svelte";
 
 interface TooltipOptions {
     text: string;

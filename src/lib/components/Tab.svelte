@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {base} from "$app/paths";
+    import {resolve} from "$app/paths";
     import {page} from "$app/state";
     import type {Snippet} from "svelte";
 
@@ -21,6 +21,11 @@
     // Routes arrive both bare ("/settings/fonts") and already base-prefixed (search results, which
     // go through `resolve`). Prefix only the bare ones, so a project-page deploy under
     // /<repo> links correctly and one that already carries the base isn't doubled.
+    //
+    // SvelteKit 3 dropped `base` from `$app/paths`, so it is read back off `resolve("/")`, which
+    // returns exactly the base plus a trailing slash. Same value the removed export held.
+    const base = $derived(resolve("/").replace(/\/$/, ""));
+
     const href = $derived.by(() => {
         if (isExternal || !route.startsWith("/")) return route;
         if (!base || route === base || route.startsWith(`${base}/`)) return route;

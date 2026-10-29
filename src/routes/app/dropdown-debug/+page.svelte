@@ -1,11 +1,11 @@
 <script lang="ts">
-    import {dev} from "$app/environment";
+    import {dev} from "$app/env";
     import {error} from "@sveltejs/kit";
-    import Group from "$lib/components/settings/Group.svelte";
-    import Item from "$lib/components/settings/Item.svelte";
-    import Separator from "$lib/components/settings/Separator.svelte";
-    import Dropdown from "$lib/components/settings/Dropdown.svelte";
-    import Page from "$lib/views/Page.svelte";
+    import Group from "#lib/components/settings/Group.svelte";
+    import Item from "#lib/components/settings/Item.svelte";
+    import Separator from "#lib/components/settings/Separator.svelte";
+    import Dropdown from "#lib/components/settings/Dropdown.svelte";
+    import Page from "#lib/views/Page.svelte";
 
     if (!dev) error(404, "Not found");
 

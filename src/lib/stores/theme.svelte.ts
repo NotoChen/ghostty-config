@@ -1,6 +1,6 @@
-import themes from "$lib/data/themes";
-import {parseTheme} from "$lib/settings/codecs";
-import type {ColorScheme} from "$lib/utils/colors";
+import themes from "#lib/data/themes";
+import {parseTheme} from "#lib/settings/codecs";
+import type {ColorScheme} from "#lib/utils/colors";
 import config, {defaults, isNonDefault} from "./config.svelte";
 
 // Theme layering view-model. `config` stores only what serializes — the raw `theme` string and

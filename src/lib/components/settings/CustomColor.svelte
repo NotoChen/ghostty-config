@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type {HexColor} from "$lib/utils/colors";
+    import type {HexColor} from "#lib/utils/colors";
     import Color from "./Color.svelte";
     import CustomInput, {type Preset, type ControlProps} from "./CustomInput.svelte";
 

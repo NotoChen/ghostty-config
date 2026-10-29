@@ -5,9 +5,9 @@
     import {resolve} from "$app/paths";
     import {scale} from "svelte/transition";
 
-    import Tab from "$lib/components/Tab.svelte";
+    import Tab from "#lib/components/Tab.svelte";
 
-    import {getGroupedResults, getHighlightParts, getResults, hasGroupedResults, hasResults, searchState, setQuery, type SearchResult} from "$lib/stores/search.svelte";
+    import {getGroupedResults, getHighlightParts, getResults, hasGroupedResults, hasResults, searchState, setQuery, type SearchResult} from "#lib/stores/search.svelte";
 
 
     const {children}: {children: Snippet} = $props();
@@ -49,7 +49,7 @@
 
         // Keyboard event needs special handling to navigate and then focus search input again for continued keyboard navigation
         if (event.type === "keydown") {
-            // eslint-disable-next-line svelte/no-navigation-without-resolve, svelte/no-goto-without-base
+            // eslint-disable-next-line svelte/no-navigation-without-resolve
             void goto(href).then(() => {
                 // Refocus search after navigation so user can continue navigating with keyboard
                 focusSearch();

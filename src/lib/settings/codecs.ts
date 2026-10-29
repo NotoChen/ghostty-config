@@ -4,7 +4,7 @@ import type {FeatureDef} from "./types";
 // `string | string[]` values (mirroring Ghostty's own string-at-rest model); each widget
 // binds the raw string and talks only to a codec here. Co-locating parse + serialize keeps the
 // round-trip contract reviewable in one place, and keeps the logic testable without mounting a
-// component (see codecs.test.ts). Matches parseKeybind/parseTrigger in $lib/utils/keybinds.ts.
+// component (see codecs.test.ts). Matches parseKeybind/parseTrigger in #lib/utils/keybinds.ts.
 
 /** A reversible string <-> value codec for one config-value format. */
 export interface Codec<T> {

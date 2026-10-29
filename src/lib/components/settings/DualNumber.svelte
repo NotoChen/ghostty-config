@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {dualNumberCodec, type LinkedValue} from "$lib/settings/codecs";
+    import {dualNumberCodec, type LinkedValue} from "#lib/settings/codecs";
     import LinkedInput from "./LinkedInput.svelte";
     import Number from "./Number.svelte";
 

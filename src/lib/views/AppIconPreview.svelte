@@ -1,6 +1,6 @@
 <script lang="ts">
-    import GhosttyIcon from "$lib/components/GhosttyIcon.svelte";
-    import config from "$lib/stores/config.svelte";
+    import GhosttyIcon from "#lib/components/GhosttyIcon.svelte";
+    import config from "#lib/stores/config.svelte";
 
 
     const iconLabel = $derived(config.macosIcon === "custom-style" ? "Custom style" : config.macosIcon === "custom" ? "Custom file" : config.macosIcon);

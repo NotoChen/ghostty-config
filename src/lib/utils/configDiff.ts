@@ -1,4 +1,4 @@
-import {registry} from "$lib/settings/registry";
+import {registry} from "#lib/settings/registry";
 import {sectionHeader, type SettingAnnotation} from "./configComments";
 import {LEGACY_KEYS} from "./parse";
 

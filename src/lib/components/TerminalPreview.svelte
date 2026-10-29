@@ -1,10 +1,10 @@
 <script lang="ts">
     import {tick, untrack} from "svelte";
     import {fade, fly} from "svelte/transition";
-    import InteractiveTerminalDom from "$lib/views/InteractiveTerminalDom.svelte";
-    import app, {clampPreviewWidth, MAX_PREVIEW_WIDTH, MIN_PREVIEW_WIDTH, savePreview} from "$lib/stores/state.svelte";
-    import config from "$lib/stores/config.svelte";
-    import {clearRecentChanges, recentChanges, trackConfig} from "$lib/stores/preview.svelte";
+    import InteractiveTerminalDom from "#lib/views/InteractiveTerminalDom.svelte";
+    import app, {clampPreviewWidth, MAX_PREVIEW_WIDTH, MIN_PREVIEW_WIDTH, savePreview} from "#lib/stores/state.svelte";
+    import config from "#lib/stores/config.svelte";
+    import {clearRecentChanges, recentChanges, trackConfig} from "#lib/stores/preview.svelte";
 
     const DEFAULT_WIDTH = 680;
     const DEFAULT_HEIGHT = 480;

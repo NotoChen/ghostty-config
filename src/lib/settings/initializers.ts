@@ -1,4 +1,4 @@
-import {getOS} from "$lib/utils/platform";
+import {getOS} from "#lib/utils/platform";
 import {registry} from "./registry";
 
 type Registry = typeof registry;

@@ -1,10 +1,10 @@
 <script lang="ts">
     import {fade, fly} from "svelte/transition";
-    import {luminosity, isDark, type HexColor} from "$lib/utils/colors";
-    import ColorPicker from "$lib/components/ColorPicker.svelte";
-    import {success} from "$lib/stores/toasts.svelte";
-    import {toAppWindow} from "$lib/attachments/portal";
-    import {createTooltipAttachment} from "$lib/attachments/tooltip";
+    import {luminosity, isDark, type HexColor} from "#lib/utils/colors";
+    import ColorPicker from "#lib/components/ColorPicker.svelte";
+    import {success} from "#lib/stores/toasts.svelte";
+    import {toAppWindow} from "#lib/attachments/portal";
+    import {createTooltipAttachment} from "#lib/attachments/tooltip";
 
     interface Props {
         value: HexColor;

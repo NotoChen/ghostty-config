@@ -1,6 +1,6 @@
 import {untrack} from "svelte";
-import {registry} from "$lib/settings/registry";
-import {diffSnapshot, firstPaletteChange, formatPreviewValue, snapshotConfig, type ConfigChange, type FlatConfig} from "$lib/utils/preview";
+import {registry} from "#lib/settings/registry";
+import {diffSnapshot, firstPaletteChange, formatPreviewValue, snapshotConfig, type ConfigChange, type FlatConfig} from "#lib/utils/preview";
 
 // Tracks what the editor just changed so the terminal preview can say *what* changed instead of
 // silently re-theming. One entry is created per changed setting; bulk operations (loading a

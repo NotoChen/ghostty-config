@@ -3,7 +3,7 @@
 // See .github/workflows/sync-themes.yml for the generation schedule.
 /* eslint-disable quote-props, key-spacing */
 
-import type {ColorScheme} from "$lib/utils/colors";
+import type {ColorScheme} from "#lib/utils/colors";
 
 export const themes = {
     "0x96f": {"palette":["#262427","#ff666d","#b3e03a","#ffc739","#00cde8","#a392e8","#9deaf6","#fcfcfa","#545452","#ff7e83","#bee55e","#ffd05e","#1bd5eb","#b0a3eb","#acedf8","#fcfcfa"],"background":"#262427","foreground":"#fcfcfa","cursorColor":"#fcfcfa","cursorText":"#000000","selectionBackground":"#fcfcfa","selectionForeground":"#262427"},

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {getSetting} from "$lib/contexts";
+    import {getSetting} from "#lib/contexts";
     import RepeatableInputModal from "../modals/RepeatableInputModal.svelte";
     import Text from "./Text.svelte";
 

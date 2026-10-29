@@ -15,10 +15,7 @@
         "types": ["bun"],
         "typeRoots": [],
         "paths": {
-            "$lib": [
-                "../src/lib"
-            ],
-            "$lib/*": [
+            "#lib/*": [
                 "../src/lib/*"
             ]
         }

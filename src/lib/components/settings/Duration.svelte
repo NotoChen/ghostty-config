@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {humanizeDuration, parseDuration} from "$lib/settings/codecs";
+    import {humanizeDuration, parseDuration} from "#lib/settings/codecs";
 
     interface Props {
         value: string;

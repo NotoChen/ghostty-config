@@ -2,7 +2,7 @@ import {browser} from "@zerebos/eslint-config";
 import ts from "@zerebos/eslint-config-typescript";
 import {defineConfig} from "eslint/config";
 import {build} from "@zerebos/eslint-config-svelte";
-import svelteConfig from "./svelte.config.js";
+import svelteOptions from "./svelte.options.ts";
 
 
 export default defineConfig(
@@ -10,7 +10,7 @@ export default defineConfig(
         ...browser,
         ...ts.configs.recommendedWithTypes
     ),
-    ...build(svelteConfig),
+    ...build(svelteOptions),
     {
         languageOptions: {
             globals: {
@@ -34,7 +34,7 @@ export default defineConfig(
         rules: {
             "no-restricted-syntax": ["error", {
                 selector: "MemberExpression[object.name='config'][property.name=/^(background|foreground|cursorColor|cursorText|selectionBackground|selectionForeground|palette)$/]",
-                message: "Read colors via effectiveColors() ($lib/stores/theme.svelte) or the --config-* CSS vars; direct config color access bypasses theme layering. Override writes belong in the settings renderer.",
+                message: "Read colors via effectiveColors() (#lib/stores/theme.svelte) or the --config-* CSS vars; direct config color access bypasses theme layering. Override writes belong in the settings renderer.",
             }],
         },
     },

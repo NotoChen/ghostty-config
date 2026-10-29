@@ -1,4 +1,4 @@
-import type {OnNavigate} from "@sveltejs/kit";
+import type {OnNavigate} from "$app/navigation";
 
 let stack: string[] = $state([window.location.pathname]);
 let index = $state(0);

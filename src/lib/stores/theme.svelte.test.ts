@@ -1,5 +1,5 @@
 import {afterEach, describe, expect, it} from "vitest";
-import themes from "$lib/data/themes";
+import themes from "#lib/data/themes";
 import config, {defaults, diff, resetSetting} from "./config.svelte";
 import {activeThemeName, colorTier, effectiveColors, paletteTier, preview, themeSelection} from "./theme.svelte";
 

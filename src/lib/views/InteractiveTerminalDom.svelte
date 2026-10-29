@@ -1,11 +1,11 @@
 <script lang="ts">
-    import type {ExecContext, Line, HistoryEntry, PromptSnapshot, DirNode, Segment} from "$lib/terminal/types";
-    import {cwdString, makeFilesystem} from "$lib/terminal/filesystem";
-    import {s} from "$lib/terminal/utils";
+    import type {ExecContext, Line, HistoryEntry, PromptSnapshot, DirNode, Segment} from "#lib/terminal/types";
+    import {cwdString, makeFilesystem} from "#lib/terminal/filesystem";
+    import {s} from "#lib/terminal/utils";
     import {tick} from "svelte";
-    import commands from "$lib/terminal/commands";
-    import {getCompletion} from "$lib/terminal/completion";
-    import {execChain} from "$lib/terminal/exec";
+    import commands from "#lib/terminal/commands";
+    import {getCompletion} from "#lib/terminal/completion";
+    import {execChain} from "#lib/terminal/exec";
 
     // Consts
     const USER = "ghostty";

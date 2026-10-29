@@ -1,10 +1,10 @@
 <script lang="ts">
-    import Group from "$lib/components/settings/Group.svelte";
-    import Item from "$lib/components/settings/Item.svelte";
-    import Separator from "$lib/components/settings/Separator.svelte";
-    import Switch from "$lib/components/settings/Switch.svelte";
-    import Text from "$lib/components/settings/Text.svelte";
-    import Range from "$lib/components/settings/Range.svelte";
+    import Group from "#lib/components/settings/Group.svelte";
+    import Item from "#lib/components/settings/Item.svelte";
+    import Separator from "#lib/components/settings/Separator.svelte";
+    import Switch from "#lib/components/settings/Switch.svelte";
+    import Text from "#lib/components/settings/Text.svelte";
+    import Range from "#lib/components/settings/Range.svelte";
 
     let fontFamily = $state("JetBrainsMono Nerd Font");
     // Range/Switch bind flat-store strings; keep this local preview state in the same shape.

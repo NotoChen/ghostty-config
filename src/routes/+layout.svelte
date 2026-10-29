@@ -1,30 +1,30 @@
 <script lang="ts">
-    // import {dev} from "$app/environment";
+    // import {dev} from "$app/env";
     import {type Snippet} from "svelte";
 
     import "../app.css";
 
-    import Gap from "$lib/components/Gap.svelte";
-    import Tab from "$lib/components/Tab.svelte";
-    import User from "$lib/components/User.svelte";
-    import ModalStack from "$lib/components/modals/ModalStack.svelte";
-    import ToastStack from "$lib/components/ToastStack.svelte";
-    import SettingsSearch from "$lib/components/SettingsSearch.svelte";
-    import MacDock from "$lib/components/MacDock.svelte";
-    import TerminalPreview from "$lib/components/TerminalPreview.svelte";
+    import Gap from "#lib/components/Gap.svelte";
+    import Tab from "#lib/components/Tab.svelte";
+    import User from "#lib/components/User.svelte";
+    import ModalStack from "#lib/components/modals/ModalStack.svelte";
+    import ToastStack from "#lib/components/ToastStack.svelte";
+    import SettingsSearch from "#lib/components/SettingsSearch.svelte";
+    import MacDock from "#lib/components/MacDock.svelte";
+    import TerminalPreview from "#lib/components/TerminalPreview.svelte";
 
-    import github from "$lib/images/tabs/github.svg";
-    import ghostty from "$lib/images/tabs/ghostty.webp";
+    import github from "#lib/images/tabs/github.svg";
+    import ghostty from "#lib/images/tabs/ghostty.webp";
 
-    import sync from "$lib/images/tabs/sync.webp";
-    import calligraphy from "$lib/images/tabs/font-playground.webp";
-    import terminal from "$lib/images/tabs/terminal.webp";
+    import sync from "#lib/images/tabs/sync.webp";
+    import calligraphy from "#lib/images/tabs/font-playground.webp";
+    import terminal from "#lib/images/tabs/terminal.webp";
 
-    import config from "$lib/stores/config.svelte";
-    import {effectiveColors} from "$lib/stores/theme.svelte";
-    import {previewStyle} from "$lib/utils/previewVars";
-    import app from "$lib/stores/state.svelte";
-    import navigation, {tabGroups} from "$lib/settings/navigation";
+    import config from "#lib/stores/config.svelte";
+    import {effectiveColors} from "#lib/stores/theme.svelte";
+    import {previewStyle} from "#lib/utils/previewVars";
+    import app from "#lib/stores/state.svelte";
+    import navigation, {tabGroups} from "#lib/settings/navigation";
 
 
     // The single funnel for the color keys: everything below reads the *effective* colors
@@ -64,7 +64,7 @@
             </div>
         </div>
         <SettingsSearch>
-            <User route="/" />
+            <User route="" />
             <!-- <Gap />
             <Tab route="/settings/application">
                 {#snippet icon()}<img src={application} alt="应用设置" />{/snippet}

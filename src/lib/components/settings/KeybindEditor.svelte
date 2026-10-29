@@ -10,10 +10,10 @@
 
         resizeDirectionOptions
 
-    } from "$lib/utils/keybinds";
-    import {createTooltipAttachment} from "$lib/attachments/tooltip";
-    import {isRecordingKey, stepCaps, stepFromEvent} from "$lib/utils/keycaps";
-    import {modifierChip} from "$lib/utils/platform";
+    } from "#lib/utils/keybinds";
+    import {createTooltipAttachment} from "#lib/attachments/tooltip";
+    import {isRecordingKey, stepCaps, stepFromEvent} from "#lib/utils/keycaps";
+    import {modifierChip} from "#lib/utils/platform";
     import {fly, scale} from "svelte/transition";
     import Group from "./Group.svelte";
     import Item from "./Item.svelte";

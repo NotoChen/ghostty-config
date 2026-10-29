@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {hexToRgb, hsvToRgb, rgbToHex, rgbToHsv, luminosity, type HexColor} from "$lib/utils/colors";
+    import {hexToRgb, hsvToRgb, rgbToHex, rgbToHsv, luminosity, type HexColor} from "#lib/utils/colors";
 
 
     // eslint-disable-next-line prefer-const
