@@ -1,6 +1,7 @@
 <script lang="ts">
     import type {PreviewState} from "#lib/stores/import.svelte";
     import {configAnnotations, sectionHeader} from "#lib/utils/configComments";
+    import {CONFIG_HEADER} from "#lib/utils/parse";
 
     interface Props {
         parsed?: boolean | PreviewState["parsed"];
@@ -36,6 +37,15 @@
     type Row =
         | {kind: "text"; text: string}
         | {kind: "setting"; key: string; value: string | string[]};
+
+    // A file's final newline terminates the last line, it does not start another one — keeping
+    // the empty segment would give this pane a trailing blank row the generated pane never has,
+    // and the two would read as one line out of step from the bottom up.
+    const rawLines = $derived.by(() => {
+        const lines = (text ?? "").split("\n");
+        if (lines.length > 1 && lines[lines.length - 1] === "") lines.pop();
+        return lines;
+    });
 
     const rows = $derived.by<Row[]>(() => {
         if (!parsedDiff) return [];
@@ -76,8 +86,12 @@
 <div class="preview" class:clamped={clampHeight}>
     {#if parsed}
         {#if hasDiff}
-            <div class="row p2"># 由 Ghostty Config 生成的配置</div>
-            <div class="row p2"># https://github.com/NotoChen/ghostty-config</div>
+            <!-- The bytes the exporter actually writes, so this pane and the file it produced can
+                 be read against each other line for line. A second copy of the header text here
+                 is how the two used to disagree (English in the file, Chinese in the preview). -->
+            {#each CONFIG_HEADER.filter(line => line !== "") as line (line)}
+                <div class="row p2">{line}</div>
+            {/each}
         {:else if showEmptyState}
             <div class="row p2"># 尚未修改默认配置</div>
         {/if}
@@ -99,7 +113,7 @@
             <div class="row p2"># 无法解析配置结构，以下为原始文本：</div>
             <div class="row">&nbsp;</div>
         {/if}
-        {#each (text ?? "").split("\n") as line, i (i)}
+        {#each rawLines as line, i (i)}
             {@const c = classify(line)}
             {#if c.kind === "comment"}
                 <div class="row p2">{line}</div>
