@@ -251,28 +251,26 @@ export const registry = {
     },
     bellAudioPath: {
         default: "",
-        description: "如果 `audio` 是已启用的响铃功能，此项为音频文件的路径。支持 `~/` 前缀。相对路径相对于配置文件所在目录；若作为 CLI 参数使用，则相对于当前工作目录。仅限 GTK。",
+        description: "如果 `audio` 是已启用的响铃功能，此项为音频文件的路径。支持 `~/` 前缀。相对路径相对于配置文件所在目录；若作为 CLI 参数使用，则相对于当前工作目录。GTK 自 1.2.0 起可用，macOS 自 1.3.0 起可用。",
         key: "bell-audio-path",
         name: "响铃音频文件",
-        note: "响铃时播放的音频文件路径。需要在响铃功能中启用 <code>audio</code>。仅限 GTK。",
-        platform: ["gtk"],
+        note: "响铃时播放的音频文件路径。需要在响铃功能中启用 <code>audio</code>。",
         since: "1.2.0"
 
     },
     bellAudioVolume: {
         default: "0.5",
-        description: "如果 `audio` 是已启用的响铃功能，此项为播放音频文件的音量（相对于系统音量）。范围从 0.0（静音）到 1.0（最大音量）。仅限 GTK。",
+        description: "如果 `audio` 是已启用的响铃功能，此项为播放音频文件的音量（相对于系统音量）。范围从 0.0（静音）到 1.0（最大音量）。GTK 自 1.2.0 起可用，macOS 自 1.3.0 起可用。",
         key: "bell-audio-volume",
         name: "响铃音量",
-        note: "响铃音频的音量，从 0（静音）到 1（最大）。仅限 GTK。",
-        platform: ["gtk"],
+        note: "响铃音频的音量，从 0（静音）到 1（最大）。",
         since: "1.2.0",
         widget: {type: "range", min: 0, max: 1, step: 0.05, showLabels: false}
 
     },
     bellFeatures: {
         default: "",
-        description: "要启用的响铃功能。逗号分隔的列表。加上 `no-` 前缀可禁用。\n\n功能：\n- `system` - 使用内置系统功能（在 macOS 上播放系统提示音）\n- `audio` - 播放自定义声音（仅限 GTK）\n- `attention` - 在失去焦点时请求用户注意（默认值：开启）\n- `title` - 在标题前添加铃铛表情（🔔），直到重新获得焦点（默认值：开启）\n- `border` - 在提醒的终端界面周围显示边框，直到重新获得焦点（GTK 自 1.2.0 起，macOS 自 1.2.1 起）",
+        description: "要启用的响铃功能。逗号分隔的列表。加上 `no-` 前缀可禁用。\n\n功能：\n- `system` - 使用内置系统功能（在 macOS 上播放系统提示音）\n- `audio` - 播放自定义声音（GTK 自 1.2.0 起，macOS 自 1.3.0 起）\n- `attention` - 在失去焦点时请求用户注意（默认值：开启）\n- `title` - 在标题前添加铃铛表情（🔔），直到重新获得焦点（默认值：开启）\n- `border` - 在提醒的终端界面周围显示边框，直到重新获得焦点（GTK 自 1.2.0 起，macOS 自 1.2.1 起）",
         key: "bell-features",
         name: "响铃功能",
         note: "逗号分隔的功能列表。可用项：system、audio、attention、title、border。加上 <code>no-</code> 前缀可禁用。",
@@ -1487,6 +1485,7 @@ export const registry = {
         key: "resize-overlay-duration",
         name: "调整大小浮层显示时长",
         note: "调整大小浮层保持可见的时长。格式如 <code>750ms</code>、<code>1s</code>。",
+        since: "1.0.0",
         widget: {type: "duration", allowEmpty: false}
 
     },
